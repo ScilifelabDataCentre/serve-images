@@ -5,13 +5,13 @@ from requests.exceptions import ConnectionError
 
 
 def get_inference_url():
-    return "http://localhost:8080"
+    return "http://torchserve:8080"
 
 def get_management_url():
-    return "http://localhost:8081"
+    return "http://torchserve:8081"
 
 def get_metrics_url():
-    return "http://localhost:8082"
+    return "http://torchserve:8082"
 
 def test_status():
     try:
@@ -34,9 +34,8 @@ def test_health():
 def test_prediction():
 
     url = get_inference_url() + "/predictions/cnn"
-    base_path = os.path.join(os.getcwd(), 'tests', 'test_data')
-    file_1 = {'data': open(os.path.join(base_path, '0.png'), 'rb')}
-    file_2 = {'data': open(os.path.join(base_path, '1.png'), 'rb')}
+    file_1 = {'data': open(os.path.join("tests", "test_data", '0.png'), 'rb')}
+    file_2 = {'data': open(os.path.join("tests", "test_data", '1.png'), 'rb')}
     response = requests.post(url, files=file_1)
     prediction = response.json()
     assert prediction == 0

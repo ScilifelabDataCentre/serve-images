@@ -1,4 +1,3 @@
-
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -26,4 +25,4 @@ class Net(nn.Module):
         x = self.dropout2(x)
         x = self.fc2(x)
         output = F.log_softmax(x, dim=1)
-        return 
+        return output
