@@ -45,7 +45,7 @@ apt_install \
 ARCH=$(dpkg --print-architecture)
 
 # install s6 supervisor
-/rocker_scripts/install_s6init.sh
+/scripts/install_s6init.sh
 
 ## Download RStudio Server for Ubuntu 18+
 DOWNLOAD_FILE=rstudio-server.deb
@@ -120,12 +120,12 @@ logger-type=syslog
 EOF
 
 # set up default user
-/rocker_scripts/default_user.sh "${DEFAULT_USER}"
+/scripts/default_user.sh "${DEFAULT_USER}"
 
 # install user config initiation script
-cp /rocker_scripts/init_set_env.sh /etc/cont-init.d/01_set_env
-cp /rocker_scripts/init_userconf.sh /etc/cont-init.d/02_userconf
-cp /rocker_scripts/pam-helper.sh /usr/lib/rstudio-server/bin/pam-helper
+cp /scripts/init_set_env.sh /etc/cont-init.d/01_set_env
+cp /scripts/init_userconf.sh /etc/cont-init.d/02_userconf
+cp /scripts/pam-helper.sh /usr/lib/rstudio-server/bin/pam-helper
 
 # Clean up
 rm -rf /var/lib/apt/lists/*

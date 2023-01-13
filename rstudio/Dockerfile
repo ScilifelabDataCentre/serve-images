@@ -14,11 +14,10 @@ ENV QUARTO_VERSION=default
 ENV DISABLE_AUTH=true
 
 RUN rm -rf rocker_scripts
-RUN mkdir rocker_scripts
-COPY scripts/ rocker_scripts/
-RUN chmod +x /rocker_scripts/*
-RUN /rocker_scripts/install_rstudio.sh
-
+RUN mkdir scripts
+COPY scripts/ scripts/
+RUN chmod +x /scripts/*
+RUN /scripts/install_rstudio.sh
 
 EXPOSE 8787
 

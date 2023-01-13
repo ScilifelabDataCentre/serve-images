@@ -26,7 +26,7 @@ DOWNLOAD_FILE=s6-overlay-${ARCH}.tar.gz
 apt_install wget ca-certificates
 
 ## Set up S6 init system
-if [ -f "/rocker_scripts/.s6_version" ] && [ "$S6_VERSION" = "$(cat /rocker_scripts/.s6_version)" ]; then
+if [ -f "/scripts/.s6_version" ] && [ "$S6_VERSION" = "$(cat /scripts/.s6_version)" ]; then
     echo "S6 already installed"
 else
     wget -P /tmp/ "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/${DOWNLOAD_FILE}"
@@ -35,7 +35,7 @@ else
     tar hzxf /tmp/$DOWNLOAD_FILE -C / --exclude=usr/bin/execlineb
     tar hzxf /tmp/$DOWNLOAD_FILE -C /usr ./bin/execlineb
 
-    echo "$S6_VERSION" >/rocker_scripts/.s6_version
+    echo "$S6_VERSION" >/scripts/.s6_version
 fi
 
 # Clean up
