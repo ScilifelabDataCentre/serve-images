@@ -1,6 +1,7 @@
 import pytest
 import requests
 import os
+import random as rnd
 from requests.exceptions import ConnectionError
 
 
@@ -43,10 +44,13 @@ def test_list_models():
 
 
 def test_scale_workers():
+    num_workers = rnd.randint(2, 6)
     url = get_management_url() + "/models/cnn"
-    data = {"min_worker": 6, "synchronous": "true"}
+    data = {"min_worker": num_workers, "synchronous": "true"}
     response = requests.put(url, params=data)
-    assert response.json()["status"] == "Workers scaled to 2 for model: cnn"
+    assert response.json()["status"] == "Workers scaled to {} for model: cnn".format(
+        num_workers
+    )
 
 
 def test_prediction():
