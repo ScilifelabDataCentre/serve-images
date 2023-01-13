@@ -2,8 +2,6 @@ name: Deploy TorchServe Image to GHCR
 
 on:
   push:
-    branches:
-      - dev
 
 jobs:
   push-store-image:
@@ -20,6 +18,10 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: 'Build Inventory Image'
+      - name: 'Run tests'
+        run: |
+          docker compose -f ./torchserve/tests/docker-compose.yml up --abort-on-container-exit --exit-code-from pytest
+
+      - name: 'Build and tag Inventory Image'
         run: |
           docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
