@@ -1,4 +1,4 @@
-name: Deploy TorchServe Image to GHCR
+name: Build and test torchserve image
 
 on:
   push:
