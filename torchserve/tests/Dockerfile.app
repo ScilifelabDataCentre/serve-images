@@ -1,5 +1,4 @@
 FROM pytorch/torchserve:latest
-LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
 ENV MODEL_STORE=models
 COPY run_server.test.sh run_server.sh

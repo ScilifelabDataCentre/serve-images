@@ -11,17 +11,10 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Login to GitHub Container Registry'
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
-
       - name: 'Run tests'
         run: |
           docker compose -f ./torchserve/tests/docker-compose.yml up --abort-on-container-exit --exit-code-from pytest
 
-      - name: 'Build and tag Inventory Image'
+      - name: 'Build and tag image'
         run: |
           docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
