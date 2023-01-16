@@ -13,4 +13,11 @@ jobs:
 
       - name: 'Build and tag image'
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+          docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./rstudio
+          
+      - name: 'Run tests'
+        env:
+          IMAGE_NAME: rstudio
+        run: | 
+          pip install ./rstudio/tests/requirements.txt
+          python3 -m pytest ./rstudio
