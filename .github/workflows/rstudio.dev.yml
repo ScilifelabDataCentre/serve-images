@@ -1,4 +1,4 @@
-name: Build and test torchserve image
+name: Build and test rstudio image
 
 on:
   push:
