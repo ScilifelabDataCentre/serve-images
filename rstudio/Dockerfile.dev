@@ -1,0 +1,63 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install R and RStudio Server dependencies
+RUN apt-get update -qq\
+  && apt-get install -y \
+    gdebi-core \
+    libapparmor1 \
+    libedit2 \
+    libssl1.1 \
+    lsb-release \
+    psmisc \
+    python3-setuptools \
+    sudo \
+    wget \
+    libclang-dev \
+    libcairo2-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt1-dev \
+    libv8-dev \
+    libjpeg-dev \
+    libprotobuf-dev \
+    protobuf-compiler \ 
+    r-base
+
+# Create a non-root user
+ENV DEFAULT_USER=rstudio-server
+
+
+# Download and install RStudio Server
+ENV ARCH=amd64
+
+RUN wget https://rstudio.org/download/latest/daily/server/bionic/rstudio-server-latest-amd64.deb \
+  && gdebi --non-interactive rstudio-server-latest-${ARCH}.deb \
+  && rm rstudio-server-latest-${ARCH}.deb
+
+RUN mkdir p /home/rstudio-server && chown -R rstudio-server:rstudio-server /home/rstudio-server
+
+RUN echo "$DEFAULT_USER:$DEFAULT_USER" | chpasswd && \
+    adduser $DEFAULT_USER sudo && \
+    echo "$DEFAULT_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+
+## RStudio wants an /etc/R, will populate from $R_HOME/etc
+RUN mkdir -p /etc/R
+
+ENV R_BIN=/usr/bin/R
+RUN echo "rsession-which-r=${R_BIN}" >/etc/rstudio/rserver.conf && \
+    echo "auth-minimum-user-id=999"  >> /etc/rstudio/rserver.conf
+
+
+# Set the working directory
+WORKDIR /home/$DEFAULT_USER
+EXPOSE 8787
+# Run commands as non-root user
+
+COPY start-rstudio-server.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start-rstudio-server.sh
+ENTRYPOINT ["/usr/local/bin/start-rstudio-server.sh"]
+#HEALTHCHECK --interval=30s --timeout=3s \
+#    CMD curl --fail http://localhost:8787/ || exit 1
