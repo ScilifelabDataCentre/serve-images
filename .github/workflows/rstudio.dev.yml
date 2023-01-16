@@ -19,5 +19,5 @@ jobs:
         env:
           IMAGE_NAME: ghcr.io/scilifelabdatacentre/rstudio:latest
         run: | 
-          pip install ./rstudio/tests/requirements.txt
+          pip install -r ./rstudio/tests/requirements.txt
           python3 -m pytest ./rstudio
