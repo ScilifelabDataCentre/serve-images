@@ -59,5 +59,6 @@ EXPOSE 8787
 COPY start-rstudio-server.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/start-rstudio-server.sh
 ENTRYPOINT ["/usr/local/bin/start-rstudio-server.sh"]
-#HEALTHCHECK --interval=30s --timeout=3s \
-#    CMD curl --fail http://localhost:8787/ || exit 1
+
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl --fail http://localhost:8787/ || exit 1

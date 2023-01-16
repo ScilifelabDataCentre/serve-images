@@ -1,0 +1,16 @@
+name: Build and test torchserve image
+
+on:
+  push:
+
+jobs:
+  build-test-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: 'Build and tag image'
+        run: |
+          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
