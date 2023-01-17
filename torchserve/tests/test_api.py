@@ -36,7 +36,7 @@ container.reload()
 def test_torchserve_status():
     assert container.status == "running"
 
-def test_rstudio_ports():
+def test_torchserve_ports():
     assert container.ports["8080/tcp"][0]["HostPort"] == "8080"
     assert container.ports["8081/tcp"][0]["HostPort"] == "8081"
     assert container.ports["8082/tcp"][0]["HostPort"] == "8082"
