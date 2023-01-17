@@ -12,13 +12,13 @@ jobs:
         uses: actions/checkout@main
 
 
-      - name: 'Build and tag image'
+      - name: 'Build and tag test image'
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+          docker build -t test-image -f ./torchserve/tests/Dockerfile.test ./torchserve
 
       - name: 'Run tests'
         env:
-          IMAGE_NAME: ghcr.io/scilifelabdatacentre/torchserve:latest
+          IMAGE_NAME: test-image
         run: | 
           pip install -r ./torchserve/tests/requirements.txt
           python3 -m pytest ./torchserve/
