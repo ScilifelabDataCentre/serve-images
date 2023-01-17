@@ -5,4 +5,4 @@ COPY run_server.sh run_server.sh
 USER root
 RUN chmod +x run_server.sh
 USER model-server
-CMD /home/model-server/run_server.sh
+ENTRYPOINT /home/model-server/run_server.sh
