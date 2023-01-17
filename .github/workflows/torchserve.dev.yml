@@ -11,10 +11,14 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Run tests'
-        run: |
-          docker compose -f ./torchserve/tests/docker-compose.yml up --abort-on-container-exit --exit-code-from pytest
 
       - name: 'Build and tag image'
         run: |
           docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+
+      - name: 'Run tests'
+        env:
+          IMAGE_NAME: ghcr.io/scilifelabdatacentre/torchserve:latest
+        run: | 
+          pip install -r ./torchserve/tests/requirements.txt
+          python3 -m pytest ./torchserve
