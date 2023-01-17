@@ -21,4 +21,4 @@ jobs:
           IMAGE_NAME: ghcr.io/scilifelabdatacentre/torchserve:latest
         run: | 
           pip install -r ./torchserve/tests/requirements.txt
-          python3 -m pytest ./torchserve
+          python3 -m pytest ./torchserve/
