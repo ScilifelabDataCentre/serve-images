@@ -14,7 +14,7 @@ jobs:
 
       - name: 'Build and tag test image'
         run: |
-          docker build -t test-image -f ./torchserve/tests/Dockerfile.test ./torchserve
+          docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
 
       - name: 'Run tests'
         env:
