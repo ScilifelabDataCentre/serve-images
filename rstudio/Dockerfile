@@ -39,10 +39,6 @@ RUN wget https://rstudio.org/download/latest/daily/server/bionic/rstudio-server-
 
 RUN mkdir p /home/rstudio-server && chown -R rstudio-server:rstudio-server /home/rstudio-server
 
-RUN echo "$DEFAULT_USER:$DEFAULT_USER" | chpasswd && \
-    adduser $DEFAULT_USER sudo && \
-    echo "$DEFAULT_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
 ## RStudio wants an /etc/R, will populate from $R_HOME/etc
 RUN mkdir -p /etc/R
 
@@ -58,4 +54,4 @@ EXPOSE 8787
 
 COPY start-rstudio-server.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/start-rstudio-server.sh
-CMD ["/usr/local/bin/start-rstudio-server.sh"]
+ENTRYPOINT ["/usr/local/bin/start-rstudio-server.sh"]
