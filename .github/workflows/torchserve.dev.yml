@@ -1,25 +1,24 @@
-name: Deploy TorchServe Image to GHCR
+name: Build and test torchserve image
 
 on:
   push:
-    branches:
-      - dev
 
 jobs:
-  push-store-image:
+  build-test-image:
     runs-on: ubuntu-latest
 
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Login to GitHub Container Registry'
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: 'Build Inventory Image'
+      - name: 'Build and tag test image'
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+          docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
+
+      - name: 'Run tests'
+        env:
+          IMAGE_NAME: test-image
+        run: | 
+          pip install -r ./torchserve/tests/requirements.txt
+          python3 -m pytest ./torchserve/

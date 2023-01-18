@@ -6,6 +6,23 @@ on:
       - main
 
 jobs:
+
+  BlackFormatting:
+    concurrency:
+      group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+      cancel-in-progress: true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check code formatting with Black
+        uses: psf/black@stable
+        with:
+          options: "-l 100 --check"
+          src: "./torchserve"
+
   push-store-image:
     runs-on: ubuntu-latest
 
