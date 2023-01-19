@@ -37,7 +37,7 @@ RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3F32EE77E331692F
 RUN wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2022.12.0-353-amd64.deb -O rstudio-download.deb && \
   dpkg-sig --verify rstudio-download.deb && \
   gdebi --non-interactive rstudio-download.deb && \
-  rm rstudio-download.deb && \
+  rm rstudio-download.deb
   
 RUN mkdir -p /home/rstudio-server/.config/rstudio /home/rstudio-server/.local/share/rstudio  && \ 
     chown -R rstudio-server:rstudio-server /home/rstudio-server && \ 
