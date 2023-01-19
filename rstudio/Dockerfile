@@ -1,6 +1,15 @@
 FROM ubuntu:20.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV HOME_DIR=/home/rstudio-server
+ENV DATA_DIR=$HOME_DIR
+ENV RSTUDIO_VERSION=2022.12.0-353
+ENV ARCH=amd64
+ENV R_BIN=/usr/bin/R
+ENV RSTUDIO_CONFIG_DIR=$HOME_DIR/.config/rstudio
+ENV RSTUDIO_CONFIG_HOME=$HOME_DIR/.config/rstudio
+ENV RSTUDIO_DATA_HOME=$HOME_DIR/.local/share/rstudio
+
 
 # Install R and RStudio Server dependencies
 RUN apt-get update -qq\
@@ -25,46 +34,42 @@ RUN apt-get update -qq\
     libjpeg-dev \
     libprotobuf-dev \
     protobuf-compiler \ 
+    locales \ 
     r-base
-
-# Create a non-root user
-ENV DEFAULT_USER=rstudio-server
-
-# Obtain key
-RUN gpg --keyserver keyserver.ubuntu.com --recv-keys 3F32EE77E331692F
-
-# Download, verify and install RStudio Server
-RUN wget https://download2.rstudio.org/server/bionic/amd64/rstudio-server-2022.12.0-353-amd64.deb -O rstudio-download.deb && \
-  dpkg-sig --verify rstudio-download.deb && \
-  gdebi --non-interactive rstudio-download.deb && \
-  rm rstudio-download.deb
-  
-RUN mkdir -p /home/rstudio-server/.config/rstudio /home/rstudio-server/.local/share/rstudio  && \ 
-    chown -R rstudio-server:rstudio-server /home/rstudio-server && \ 
-    rm -rf /home/rstudio-server/R
-
-## RStudio wants an /etc/R, will populate from $R_HOME/etc
-RUN mkdir -p /etc/R
-
-ENV R_BIN=/usr/bin/R
-ENV RSTUDIO_CONFIG_DIR=/home/$DEFAULT_USER/.config/rstudio
-ENV RSTUDIO_CONFIG_HOME=/home/$DEFAULT_USER/.config/rstudio
-ENV RSTUDIO_DATA_HOME=/home/$DEFAULT_USER/.local/share/rstudio
+    
 
 
-RUN echo "rsession-which-r=${R_BIN}" >$RSTUDIO_CONFIG_DIR/rserver.conf && \
+RUN locale-gen en_US.UTF-8 && \ 
+    update-locale "LANG=en_US.UTF-8" && \
+    gpg --keyserver keyserver.ubuntu.com --recv-keys 3F32EE77E331692F && \
+    wget -q https://download2.rstudio.org/server/bionic/${ARCH}/rstudio-server-${RSTUDIO_VERSION}-${ARCH}.deb -O rstudio-download.deb && \
+    dpkg-sig --verify rstudio-download.deb && \
+    gdebi --non-interactive rstudio-download.deb && \
+    rm rstudio-download.deb && \
+    mkdir -p $HOME_DIR/.config/rstudio $HOME_DIR/.local/share/rstudio  && \ 
+    chown -R rstudio-server:rstudio-server $HOME_DIR && \ 
+    mkdir -p /etc/R && \ 
+    echo "rsession-which-r=${R_BIN}" >$RSTUDIO_CONFIG_DIR/rserver.conf && \
     echo "auth-minimum-user-id=999"  >> $RSTUDIO_CONFIG_DIR/rserver.conf && \
     echo "server-daemonize=0" >> $RSTUDIO_CONFIG_DIR/rserver.conf && \
     echo "auth-validate-users=0" >> $RSTUDIO_CONFIG_DIR/rserver.conf && \
     echo "auth-none=1" >> $RSTUDIO_CONFIG_DIR/rserver.conf && \
-    echo "server-data-dir=/home/$DEFAULT_USER" && \
-    echo "rsession-path=/usr/lib/rstudio-server/bin/rsession" 
+    echo "server-data-dir=$DATA_DIR" && \
+    echo "rsession-path=/usr/lib/rstudio-server/bin/rsession"
+
+
+RUN apt-get autoremove -yq && apt-get autoclean -yq && apt remove -y \
+  python3-setuptools \
+  wget \
+  gdebi-core \
+  dpkg-sig
 
 # Set the working directory
-WORKDIR /home/$DEFAULT_USER
+WORKDIR $HOME_DIR
 
 COPY start-rstudio-server.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/start-rstudio-server.sh
+RUN chmod +x /usr/local/bin/start-rstudio-server.sh && rm -rf $HOME_DIR/R
 
-ENTRYPOINT ["/usr/local/bin/start-rstudio-server.sh"] 
+
+CMD ["/usr/local/bin/start-rstudio-server.sh"] 
 EXPOSE 8787
