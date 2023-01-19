@@ -77,5 +77,6 @@ def get_inference_url(contr):
         :param container contr: The container object.
         :returns string url: The URL string.
     """
-    url = "http://{}:8888".format(contr.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"])
+    ip = contr.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+    url = f"http://{ip}:{PORT}"
     return url
