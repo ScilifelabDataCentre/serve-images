@@ -3,6 +3,7 @@ LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/st
 
 USER root 
 RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get remove --purge python-setuptools
     && apt-get -yq update \
     && apt-get -yq install --no-install-recommends \
     && apt-get clean \

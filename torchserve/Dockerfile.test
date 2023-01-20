@@ -5,6 +5,7 @@ COPY tests/run_server.test.sh run_server.sh
 
 USER root 
 RUN export DEBIAN_FRONTEND=noninteractive \
+    && apt-get remove --purge python-setuptools
     && apt-get -yq update \
     && apt-get -yq install --no-install-recommends \
     && apt-get clean \
@@ -13,6 +14,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get upgrade -yq \
     && apt-get autoremove -yq && apt-get autoclean -yq \ 
     && pip install --upgrade pip torch torchvision torchtext torchaudio setuptools future 
+
 
 RUN chmod +x run_server.sh
 USER model-server
