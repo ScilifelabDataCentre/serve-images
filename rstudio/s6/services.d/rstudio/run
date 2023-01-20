@@ -9,5 +9,4 @@ exec /usr/lib/rstudio-server/bin/rserver \
   --www-address=0.0.0.0 \
   --www-port=8787 \
   --auth-none=1 \
-  --rsession-which-r=$(which R) \
-  --rsession-path=/opt/rsession.sh
+  --rsession-which-r=$(which R)

@@ -4,13 +4,9 @@ FROM ubuntu:20.04
 # common environemnt variables
 ENV NB_USER jovyan
 ENV NB_UID 1000
-ENV NB_PREFIX /
 ENV HOME /home/$NB_USER
-ENV SHELL /bin/bash
 
 # args - software versions
-ARG KUBECTL_ARCH="amd64"
-ARG KUBECTL_VERSION=v1.21.0
 ARG S6_ARCH="amd64"
  # renovate: datasource=github-tags depName=just-containers/s6-overlay versioning=loose
 ARG S6_VERSION=v2.2.0.3
@@ -18,7 +14,7 @@ ARG S6_VERSION=v2.2.0.3
 # set shell to bash
 SHELL ["/bin/bash", "-c"]
 
-# install - usefull linux packages
+# install - useful linux packages
 RUN export DEBIAN_FRONTEND=noninteractive \
  && apt-get -yq update \
  && apt-get -yq install --no-install-recommends \
@@ -40,23 +36,31 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     wget \
     zip \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get autoremove -yq && apt-get autoclean -yq
+
+# create gpg folder with correct permissions
+
+RUN useradd -M -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+   && mkdir -p ${HOME} \
+   && chown -R ${NB_USER}:users ${HOME} \
+   && mkdir ${HOME}/.gnupg \
+   && chmod 700 ${HOME}/.gnupg
 
 # install - s6 overlay
 RUN export GNUPGHOME=/tmp/ \
  && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer" -o /tmp/s6-overlay-${S6_VERSION}-installer \
  && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer.sig" -o /tmp/s6-overlay-${S6_VERSION}-installer.sig
-#RUN gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 6101B2783B2FD161 \
-# && gpg -q --verify /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer \
+
+# Verify download
+RUN gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 6101B2783B2FD161 \
+   && gpg -q --verify /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer
+
 RUN chmod +x /tmp/s6-overlay-${S6_VERSION}-installer \
  && /tmp/s6-overlay-${S6_VERSION}-installer / \
  && rm /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer
 
-# create user and set required ownership
-RUN useradd -M -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
- && mkdir -p ${HOME} \
- && chown -R ${NB_USER}:users ${HOME} \
- && chown -R ${NB_USER}:users /usr/local/bin \
+RUN chown -R ${NB_USER}:users /usr/local/bin \
  && chown -R ${NB_USER}:users /etc/s6
 
 # set locale configs
@@ -68,19 +72,8 @@ ENV LC_ALL en_US.UTF-8
 
 ### Second image
 
-
-# args - software versions
-ARG MINIFORGE_ARCH="x86_64"
-# renovate: datasource=github-tags depName=conda-forge/miniforge versioning=loose
-ARG MINIFORGE_VERSION=4.10.1-4
-ARG PIP_VERSION=21.1.2
-ARG PYTHON_VERSION=3.8.10
 ARG RSTUDIO_ARCH="amd64"
-# renovate: datasource=github-tags depName=rstudio/rstudio versioning=semver
 ARG RSTUDIO_VERSION=2022.12.0+353
-ARG R_BASE_VERSION=4.1.0
-ARG R_RETICULATE_VERSION=1.20
-ARG R_PNG_VERSION=0.1_7
 
 # install - binary rstudio dependencies
 RUN apt-get -yq update \
@@ -94,64 +87,26 @@ RUN apt-get -yq update \
     psmisc \
     rrdtool \
     sudo \
+    r-base \
  && apt-get clean \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && apt-get autoremove -yq && apt-get autoclean -yq
 
-# setup environment for conda
-ENV CONDA_DIR /opt/conda
-ENV PATH "${CONDA_DIR}/bin:${PATH}"
-RUN mkdir -p ${CONDA_DIR} \
- && echo ". /opt/conda/etc/profile.d/conda.sh" >> ${HOME}/.bashrc \
- && echo ". /opt/conda/etc/profile.d/conda.sh" >> /etc/profile \
- && echo "conda activate base" >> ${HOME}/.bashrc \
- && echo "conda activate base" >> /etc/profile \
- && chown -R ${NB_USER}:users ${CONDA_DIR} \
- && chown -R ${NB_USER}:users ${HOME}
-
-# setup environment for R
-ENV R_HOME ${CONDA_DIR}/lib/R
-
-USER ${NB_UID}
-
-# install - conda, pip, python, r-base
-RUN curl -sL "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-${MINIFORGE_ARCH}.sh" -o /tmp/Miniforge3.sh \
- && curl -sL "https://github.com/conda-forge/miniforge/releases/download/${MINIFORGE_VERSION}/Miniforge3-${MINIFORGE_VERSION}-Linux-${MINIFORGE_ARCH}.sh.sha256" -o /tmp/Miniforge3.sh.sha256 \
- && echo "$(cat /tmp/Miniforge3.sh.sha256 | awk '{ print $1; }') /tmp/Miniforge3.sh" | sha256sum --check \
- && rm /tmp/Miniforge3.sh.sha256 \
- && /bin/bash /tmp/Miniforge3.sh -b -f -p ${CONDA_DIR} \
- && rm /tmp/Miniforge3.sh \
- && conda config --system --set auto_update_conda false \
- && conda config --system --set show_channel_urls true \
- && echo "conda ${MINIFORGE_VERSION:0:-2}" >> ${CONDA_DIR}/conda-meta/pinned \
- && echo "python ${PYTHON_VERSION}" >> ${CONDA_DIR}/conda-meta/pinned \
- && echo "r-base ${R_BASE_VERSION}" >> ${CONDA_DIR}/conda-meta/pinned \
- && conda install -y -q \
-    python=${PYTHON_VERSION} \
-    conda=${MINIFORGE_VERSION:0:-2} \
-    pip=${PIP_VERSION} \
-    r-base=${R_BASE_VERSION} \
-    r-reticulate=${R_RETICULATE_VERSION} \
-    r-png=${R_PNG_VERSION} \
- && conda update -y -q --all \
- && conda clean -a -f -y \
- && chown -R ${NB_USER}:users ${CONDA_DIR} \
- && chown -R ${NB_USER}:users ${HOME}
-
-# set default CRAN repo to RSPM (it has pre-compiled R packages, increasing user install speed)
-RUN echo 'options(repos=c(CRAN="https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' >> ${R_HOME}/etc/Rprofile.site \
- && echo 'options(HTTPUserAgent=sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ${R_HOME}/etc/Rprofile.site
+ENV R_HOME usr/lib/R
 
 # R needs TZ set
 ENV TZ Etc/UTC
 RUN echo "TZ=${TZ}" >> ${R_HOME}/etc/Renviron.site
 
-USER root
+# set default CRAN repo to RSPM (it has pre-compiled R packages, increasing user install speed)
+RUN echo 'options(repos=c(CRAN="https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' >>  ${R_HOME}/etc/Rprofile.site \
+ && echo 'options(HTTPUserAgent=sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ${R_HOME}/etc/Rprofile.site
 
 RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudio-server-${RSTUDIO_VERSION//+/-}-${RSTUDIO_ARCH}.deb" -o /tmp/rstudio-server.deb \
     # add rstudio public code-signing key
- #&& gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 3F32EE77E331692F \
+ && gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 3F32EE77E331692F \
     # validate the build signature
- #&& dpkg-sig --verify /tmp/rstudio-server.deb \
+ && dpkg-sig --verify /tmp/rstudio-server.deb \
  && dpkg -i /tmp/rstudio-server.deb \
  && rm -f /tmp/rstudio-server.deb \
     # our Kaniko build excludes `/var/run/*` but RStudio needs those files,
@@ -167,10 +122,6 @@ RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudi
  && chown -R ${NB_USER}:users /usr/lib/rstudio-server \
  && chown -R ${NB_USER}:users /var/lib/rstudio-server
 
-# tell rstudio to use conda python by setting `RETICULATE_PYTHON` with `--rsession-path=/opt/rsession.sh`
-COPY --chown=${NB_USER}:users rsession.sh /opt
-RUN chmod +x /opt/rsession.sh
-
 # s6 - copy scripts
 COPY --chown=${NB_USER}:users s6/ /etc
 
@@ -180,7 +131,5 @@ RUN mkdir -p /tmp_home \
  && chown -R ${NB_USER}:users /tmp_home
 
 USER ${NB_UID}
-
 EXPOSE 8787
-
 ENTRYPOINT ["/init"]
