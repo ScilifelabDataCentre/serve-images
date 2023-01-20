@@ -4,17 +4,17 @@ on:
   push:
 
 jobs:
-  build-test-image:
+  build_and_test:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Build and tag image'
+      - name: 'Build Inventory Image'
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./rstudio
-          
+            docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./rstudio
+
       - name: 'Run tests'
         env:
           IMAGE_NAME: ghcr.io/scilifelabdatacentre/rstudio:latest
