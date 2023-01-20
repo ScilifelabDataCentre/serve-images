@@ -25,9 +25,16 @@ jobs:
           python3 -m pytest ./rstudio
 
   push: 
+    if: github.repository == 'scilifelabdatacentre/serve-images
     needs: build_and_test
     runs-on: ubuntu-latest
-
+    concurrency:
+      group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      packages: write
+      
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
