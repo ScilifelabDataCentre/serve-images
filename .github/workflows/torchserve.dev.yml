@@ -15,9 +15,17 @@ jobs:
         run: |
             docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
 
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.7.1
+        with:
+          image-ref: 'test-image'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+
       - name: 'Run tests'
         env:
-          IMAGE_NAME: ghcr.io/scilifelabdatacentre/test-image:latest
+          IMAGE_NAME: test-image
         run: | 
           pip install -r ./torchserve/tests/requirements.txt
           python3 -m pytest ./torchserve
