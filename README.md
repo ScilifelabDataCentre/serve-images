@@ -12,3 +12,8 @@ In this repo, we work [Trunk based](https://www.toptal.com/software/trunk-based-
 $ chmod +x ./dev_scripts/run_torchserve.sh
 $ ./dev_scripts/run_torchserve.sh
 ```
+
+```
+$ chmod +x ./dev_scripts/run_jupyterlab.sh
+$ ./dev_scripts/run_jupyterlab.sh
+```

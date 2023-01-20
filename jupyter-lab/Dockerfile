@@ -1,5 +1,5 @@
 FROM jupyter/minimal-notebook:python-3.8.8
-#LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
+LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
 USER root
 RUN /bin/bash -c "apt update"
