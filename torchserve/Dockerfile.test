@@ -5,7 +5,7 @@ COPY tests/run_server.test.sh run_server.sh
 
 USER root 
 RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get remove --purge python-setuptools
+    && apt-get remove --purge python-setuptools \
     && apt-get -yq update \
     && apt-get -yq install --no-install-recommends \
     && apt-get clean \
