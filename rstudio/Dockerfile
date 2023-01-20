@@ -1,96 +1,80 @@
-# Use the respective Makefile to build the image.
 FROM ubuntu:20.04
 
-# common environemnt variables
+# Common environment variables
 ENV NB_USER jovyan
 ENV NB_UID 1000
 ENV HOME /home/$NB_USER
 
-# args - software versions
+# Arguments for software versions
 ARG S6_ARCH="amd64"
- # renovate: datasource=github-tags depName=just-containers/s6-overlay versioning=loose
 ARG S6_VERSION=v2.2.0.3
+ARG RSTUDIO_ARCH="amd64"
+ARG RSTUDIO_VERSION=2022.12.0+353
 
-# set shell to bash
+# Set shell to bash
 SHELL ["/bin/bash", "-c"]
 
-# install - useful linux packages
+# Install useful Linux packages and cleanup
 RUN export DEBIAN_FRONTEND=noninteractive \
- && apt-get -yq update \
- && apt-get -yq install --no-install-recommends \
-    apt-transport-https \
-    bash \
-    bzip2 \
-    ca-certificates \
-    curl \
-    git \
-    gnupg \
-    gnupg2 \
-    locales \
-    lsb-release \
-    nano \
-    software-properties-common \
-    tzdata \
-    unzip \
-    vim \
-    wget \
-    zip \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* \
- && apt-get autoremove -yq && apt-get autoclean -yq
+    && apt-get -yq update \
+    && apt-get -yq install --no-install-recommends \
+      apt-transport-https \
+      bash \
+      bzip2 \
+      ca-certificates \
+      curl \
+      git \
+      gnupg \
+      gnupg2 \
+      locales \
+      lsb-release \
+      nano \
+      software-properties-common \
+      tzdata \
+      unzip \
+      vim \
+      wget \
+      zip \
+      dpkg-sig \
+      libapparmor1 \
+      libc6 \
+      libclang-dev \
+      libedit2 \
+      libpq5 \
+      psmisc \
+      rrdtool \
+      sudo \
+      r-base \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get -yq update \ 
+    && apt-get autoremove -yq && apt-get autoclean -yq
 
-# create gpg folder with correct permissions
-
+# Create user and set permissions
 RUN useradd -M -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
    && mkdir -p ${HOME} \
    && chown -R ${NB_USER}:users ${HOME} \
    && mkdir ${HOME}/.gnupg \
    && chmod 700 ${HOME}/.gnupg
 
-# install - s6 overlay
+# Install - s6 overlay
 RUN export GNUPGHOME=/tmp/ \
- && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer" -o /tmp/s6-overlay-${S6_VERSION}-installer \
- && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer.sig" -o /tmp/s6-overlay-${S6_VERSION}-installer.sig
+   && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer" -o /tmp/s6-overlay-${S6_VERSION}-installer \
+   && curl -sL "https://github.com/just-containers/s6-overlay/releases/download/${S6_VERSION}/s6-overlay-${S6_ARCH}-installer.sig" -o /tmp/s6-overlay-${S6_VERSION}-installer.sig \
+   && gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 6101B2783B2FD161 \
+   && gpg -q --verify /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer \
+   && chmod +x /tmp/s6-overlay-${S6_VERSION}-installer \
+   && /tmp/s6-overlay-${S6_VERSION}-installer / \
+   && rm /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer \ 
+   && chown -R ${NB_USER}:users /usr/local/bin \
+   && chown -R ${NB_USER}:users /etc/s6
 
-# Verify download
-RUN gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 6101B2783B2FD161 \
-   && gpg -q --verify /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer
-
-RUN chmod +x /tmp/s6-overlay-${S6_VERSION}-installer \
- && /tmp/s6-overlay-${S6_VERSION}-installer / \
- && rm /tmp/s6-overlay-${S6_VERSION}-installer.sig /tmp/s6-overlay-${S6_VERSION}-installer
-
-RUN chown -R ${NB_USER}:users /usr/local/bin \
- && chown -R ${NB_USER}:users /etc/s6
-
-# set locale configs
+# Set locale configs
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
  && locale-gen
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
-
-### Second image
-
-ARG RSTUDIO_ARCH="amd64"
-ARG RSTUDIO_VERSION=2022.12.0+353
-
-# install - binary rstudio dependencies
-RUN apt-get -yq update \
- && apt-get -yq install --no-install-recommends \
-    dpkg-sig \
-    libapparmor1 \
-    libc6 \
-    libclang-dev \
-    libedit2 \
-    libpq5 \
-    psmisc \
-    rrdtool \
-    sudo \
-    r-base \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* \
- && apt-get autoremove -yq && apt-get autoclean -yq
 
 ENV R_HOME usr/lib/R
 
@@ -98,25 +82,19 @@ ENV R_HOME usr/lib/R
 ENV TZ Etc/UTC
 RUN echo "TZ=${TZ}" >> ${R_HOME}/etc/Renviron.site
 
-# set default CRAN repo to RSPM (it has pre-compiled R packages, increasing user install speed)
+# Set default CRAN repo to RSPM (it has pre-compiled R packages, increasing user install speed)
+ENV R_HOME usr/lib/R
 RUN echo 'options(repos=c(CRAN="https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' >>  ${R_HOME}/etc/Rprofile.site \
  && echo 'options(HTTPUserAgent=sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ${R_HOME}/etc/Rprofile.site
 
 RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudio-server-${RSTUDIO_VERSION//+/-}-${RSTUDIO_ARCH}.deb" -o /tmp/rstudio-server.deb \
-    # add rstudio public code-signing key
  && gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 3F32EE77E331692F \
-    # validate the build signature
  && dpkg-sig --verify /tmp/rstudio-server.deb \
  && dpkg -i /tmp/rstudio-server.deb \
  && rm -f /tmp/rstudio-server.deb \
-    # our Kaniko build excludes `/var/run/*` but RStudio needs those files,
-    # so we move them to `/run`, wich is actually the same place due to symbolic links
  && mv -n /var/run/rstudio-server* /run \
-    # use advisory file-locks to improve PVC support
  && echo "lock-type=advisory" > /etc/rstudio/file-locks \
-    # allow kubeflow to display rstudio in an iframe
  && echo "www-frame-origin=same" >> /etc/rstudio/rserver.conf \
-    # allows the non-root NB_USER to run rstudio
  && chown -R ${NB_USER}:users /etc/rstudio \
  && chown -R ${NB_USER}:users /run/rstudio-server* \
  && chown -R ${NB_USER}:users /usr/lib/rstudio-server \
