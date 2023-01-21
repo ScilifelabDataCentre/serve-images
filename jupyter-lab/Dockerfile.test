@@ -1,0 +1,13 @@
+# TODO: change to latest
+FROM jupyter/minimal-notebook:python-3.8.8
+
+COPY tests/notebooks/basic.ipynb tests/basic.ipynb
+
+USER root
+RUN /bin/bash -c "apt update"
+RUN /bin/bash -c "apt install curl -y"
+
+USER $NB_UID
+RUN pip install mlflow boto3
+RUN pip uninstall minio -y
+RUN pip install minio==7.0.2

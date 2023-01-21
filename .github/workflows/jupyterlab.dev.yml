@@ -13,11 +13,11 @@ jobs:
 
       - name: 'Build Staging Image'
         run: |
-            docker build -t ghcr.io/scilifelabdatacentre/jupyter-lab:latest ./jupyter-lab
+            docker build -t test-image -f ./jupyter-lab/Dockerfile.test ./jupyter-lab
 
       - name: 'Run tests'
         env:
-          IMAGE_NAME: ghcr.io/scilifelabdatacentre/jupyter-lab:latest
+          IMAGE_NAME: test-image
         run: | 
           pip install -r ./jupyter-lab/tests/requirements.txt
           python3 -m pytest ./jupyter-lab

@@ -1,7 +1,6 @@
 #!/bin/bash
 
-#docker build -t jupyterlab-dev-img -f ./jupyter-lab/Dockerfile.test ./jupyterlab
-docker build -t jupyterlab-dev-img ./jupyter-lab
+docker build -t jupyterlab-dev-img -f ./jupyter-lab/Dockerfile.test ./jupyter-lab
 python3 -m venv venv
 source ./venv/bin/activate
 python3 -m pip install --upgrade pip
