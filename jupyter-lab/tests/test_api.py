@@ -1,5 +1,6 @@
 import os
-#import random as rnd
+
+# import random as rnd
 import time
 import datetime
 import uuid
@@ -11,43 +12,44 @@ import pytest
 import docker
 
 
-
 # Settings
-PORT = 8888                             # the jupyter-lab port
-HOST = "localhost:8888"                 # the host
-NOTEBOOK_PATH = "tests/basic.ipynb"     # the relative path to the jupyter test notebook
-TOKEN = "a268cff61a101aaefe53b02b5a787ddfc0e07d4119154bff"      # the token to use
-TIMEOUT_CALL = 5                        # the timeout in seconds of the client request call
-
+PORT = 8888  # the jupyter-lab port
+HOST = "localhost:8888"  # the host
+NOTEBOOK_PATH = "tests/basic.ipynb"  # the relative path to the jupyter test notebook
+TOKEN = "a268cff61a101aaefe53b02b5a787ddfc0e07d4119154bff"  # the token to use
+TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 
 
 client = docker.from_env()
 
-container = client.containers.run(os.environ['IMAGE_NAME'],
-    command = f"start-notebook.sh --NotebookApp.token='{TOKEN}'",
-    ports={f'{PORT}/tcp': PORT, },
-    detach=True)
+container = client.containers.run(
+    os.environ["IMAGE_NAME"],
+    command=f"start-notebook.sh --NotebookApp.token='{TOKEN}'",
+    ports={
+        f"{PORT}/tcp": PORT,
+    },
+    detach=True,
+)
 
 time.sleep(20)
 
 container.reload()
 
 
-
 # Tests
 def test_jupyterlab_status_is_running():
-    """ Test that the jupyter-lab container is running. """
+    """Test that the jupyter-lab container is running."""
     assert container.status == "running"
 
 
 def test_jupyterlab_ports():
-    """ Test of the expected container port. """
+    """Test of the expected container port."""
     assert len(container.ports) == 1, "There should be 1 port"
     assert container.ports[f"{PORT}/tcp"][0]["HostPort"] == str(PORT)
 
 
 def test_jupyterlab_can_ping_container():
-    """ Test of basic communication with the container returns status 200 (OK). """
+    """Test of basic communication with the container returns status 200 (OK)."""
     try:
         url = _get_inference_url(container) + "/ping"
         response = requests.get(url, timeout=TIMEOUT_CALL)
@@ -59,7 +61,7 @@ def test_jupyterlab_can_ping_container():
 
 @pytest.mark.skip(reason="This test not working for jupyter-lab.")
 def test_health():
-    """ Test that the basic ping call returns parseable json with status Healthy. """
+    """Test that the basic ping call returns parseable json with status Healthy."""
     try:
         url = _get_inference_url(container) + "/ping"
         response = requests.get(url, timeout=TIMEOUT_CALL)
@@ -71,19 +73,19 @@ def test_health():
 
 
 def test_verify_test_files():
-    """ Verify that the test notebooks exist and can be accessed.
-    """
-    headers = {'Authorization': 'Token {0}'.format(TOKEN)}
+    """Verify that the test notebooks exist and can be accessed."""
+    headers = {"Authorization": "Token {0}".format(TOKEN)}
     nb_path = _get_notebooks(headers, HOST, TIMEOUT_CALL)
     assert nb_path == NOTEBOOK_PATH, "The notebook path"
 
 
 def test_notebook():
-    """ Test of notebook outputs.
-    """
-    headers = {'Authorization': 'Token {0}'.format(TOKEN)}
+    """Test of notebook outputs."""
+    headers = {"Authorization": "Token {0}".format(TOKEN)}
 
-    cell_outputs = _get_notebook_cell_outputs(headers, HOST, NOTEBOOK_PATH, TIMEOUT_CALL)
+    cell_outputs = _get_notebook_cell_outputs(
+        headers, HOST, NOTEBOOK_PATH, TIMEOUT_CALL
+    )
     assert len(cell_outputs) == 1, len(cell_outputs)
 
     val = cell_outputs[0]
@@ -92,22 +94,21 @@ def test_notebook():
 
 
 def test_shutdown():
-    """ Test stopping the container. """
+    """Test stopping the container."""
     container.stop()
     container.reload()
-    assert container.status == 'exited'
+    assert container.status == "exited"
     container.remove()
-
-
 
 
 # Private methods
 
-def _get_inference_url(contr):
-    """ Gets the inference URL of the container.
 
-        :param container contr: The container object.
-        :returns string url: The URL string.
+def _get_inference_url(contr):
+    """Gets the inference URL of the container.
+
+    :param container contr: The container object.
+    :returns string url: The URL string.
     """
     ip = contr.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
     url = f"http://{ip}:{PORT}"
@@ -115,23 +116,22 @@ def _get_inference_url(contr):
 
 
 def _get_notebooks(headers, host, timeout_call):
-    """ Gets a list of relative paths to notebooks in jupyter-lab.
-    """
+    """Gets a list of relative paths to notebooks in jupyter-lab."""
     base_url = f"http://{host}"
 
     # Verify the notebook folder work exists
-    url = base_url + '/api/contents'
-    response = requests.get(url,headers=headers, timeout=timeout_call)
+    url = base_url + "/api/contents"
+    response = requests.get(url, headers=headers, timeout=timeout_call)
     assert response.status_code == 200, f"response status is {response.status_code}"
     contents = json.loads(response.text)
 
     for item in contents["content"]:
-        print(f"{item['name']}, {item['path']}" )
+        print(f"{item['name']}, {item['path']}")
 
     assert len(contents["content"]) >= 2, "There should be 2 folders: tests and work"
 
-    url = base_url + '/api/contents/tests'
-    response = requests.get(url,headers=headers, timeout=timeout_call)
+    url = base_url + "/api/contents/tests"
+    response = requests.get(url, headers=headers, timeout=timeout_call)
     assert response.status_code == 200, f"response status is {response.status_code}"
 
     folder_contents = json.loads(response.text)
@@ -142,29 +142,35 @@ def _get_notebooks(headers, host, timeout_call):
 
 
 def _get_notebook_cell_outputs(headers, host, notebook_path, timeout_call):
-    """ Gets the output contents of all notebook code cells.
-    """
+    """Gets the output contents of all notebook code cells."""
     base_url = f"http://{host}"
 
-    url = base_url + '/api/kernels'
-    response = requests.post(url,headers=headers, timeout=timeout_call)
+    url = base_url + "/api/kernels"
+    response = requests.post(url, headers=headers, timeout=timeout_call)
     assert response.status_code == 201, f"response status is {response.status_code}"
     kernel = json.loads(response.text)
 
     # Load the notebook and get the code of each cell
-    url = base_url + '/api/contents/' + notebook_path
-    response = requests.get(url,headers=headers, timeout=timeout_call)
-    assert response.status_code == 200, f"response status is {response.status_code}. URL used {url}"
+    url = base_url + "/api/contents/" + notebook_path
+    response = requests.get(url, headers=headers, timeout=timeout_call)
+    assert (
+        response.status_code == 200
+    ), f"response status is {response.status_code}. URL used {url}"
 
     file = json.loads(response.text)
 
-    code = [ c['source'] for c in file['content']['cells'] if c['cell_type']=="code" and len(c['source'])>0 ]
+    code = [
+        c["source"]
+        for c in file["content"]["cells"]
+        if c["cell_type"] == "code" and len(c["source"]) > 0
+    ]
 
     print(code)
     print("Creating connection to api/kernels")
 
-    ws = create_connection(f"ws://{host}/api/kernels/" + kernel["id"]+"/channels",
-        header=headers)
+    ws = create_connection(
+        f"ws://{host}/api/kernels/" + kernel["id"] + "/channels", header=headers
+    )
 
     print("Sending code in loop")
 
@@ -174,7 +180,7 @@ def _get_notebook_cell_outputs(headers, host, notebook_path, timeout_call):
     outputs = []
 
     for i in range(0, len(code)):
-        msg_type = ''
+        msg_type = ""
         while msg_type != "stream":
             rsp = json.loads(ws.recv())
             msg_type = rsp["msg_type"]
@@ -186,17 +192,16 @@ def _get_notebook_cell_outputs(headers, host, notebook_path, timeout_call):
 
 
 def _send_execute_request(code):
-    """ Gets a message body to send to a jupyter lab server.
-    """
-    msg_type = 'execute_request'
-    content = { 'code' : code, 'silent':False }
-    hdr = { 'msg_id' : uuid.uuid1().hex, 
-        'username': 'test', 
-        'session': uuid.uuid1().hex, 
-        'data': datetime.datetime.now().isoformat(),
-        'msg_type': msg_type,
-        'version' : '5.0' }
-    msg = { 'header': hdr, 'parent_header': hdr, 
-        'metadata': {},
-        'content': content }
+    """Gets a message body to send to a jupyter lab server."""
+    msg_type = "execute_request"
+    content = {"code": code, "silent": False}
+    hdr = {
+        "msg_id": uuid.uuid1().hex,
+        "username": "test",
+        "session": uuid.uuid1().hex,
+        "data": datetime.datetime.now().isoformat(),
+        "msg_type": msg_type,
+        "version": "5.0",
+    }
+    msg = {"header": hdr, "parent_header": hdr, "metadata": {}, "content": content}
     return msg

@@ -1,4 +1,5 @@
-pytest
+black
 requests
 docker
+pytest
 nbval
