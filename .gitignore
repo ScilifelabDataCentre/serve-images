@@ -1,5 +1,4 @@
 .Dockerfile.swp
-.Dockerfile.swp
 venv/
 .pytest_cache
 __pycache__
