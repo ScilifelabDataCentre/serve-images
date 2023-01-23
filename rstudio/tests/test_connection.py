@@ -24,7 +24,7 @@ def test_rstudio_access():
     rstudio_url = "http://{}:8787".format(
         container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
     )
-    response = requests.get(rstudio_url)
+    response = requests.get(rstudio_url, timeout=15)
     assert response.status_code == 200
     assert "RStudio" in response.text
 
