@@ -8,33 +8,45 @@ import docker
 
 
 def get_inference_url(container):
-    url = "http://{}:8080".format(container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"])
+    url = "http://{}:8080".format(
+        container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+    )
     return url
 
 
 def get_management_url(container):
-    url = "http://{}:8081".format(container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"])
+    url = "http://{}:8081".format(
+        container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+    )
     return url
 
 
 def get_metrics_url(container):
-    url = "http://{}:8082".format(container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"])
+    url = "http://{}:8082".format(
+        container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+    )
     return url
 
 
 client = docker.from_env()
-container = client.containers.run(os.environ['IMAGE_NAME'], ports={'8080/tcp': 8080, 
-                                                                    '8081/tcp': 8081,
-                                                                    '8082/tcp': 8082,
-                                                                    '7070/tcp': 7070,
-                                                                    '7071/tcp': 7071,
-                                                                    }, detach=True)
+container = client.containers.run(
+    os.environ["IMAGE_NAME"],
+    ports={
+        "8080/tcp": 8080,
+        "8081/tcp": 8081,
+        "8082/tcp": 8082,
+        "7070/tcp": 7070,
+        "7071/tcp": 7071,
+    },
+    detach=True,
+)
 time.sleep(20)
 container.reload()
 
 
 def test_torchserve_status():
     assert container.status == "running"
+
 
 def test_torchserve_ports():
     assert container.ports["8080/tcp"][0]["HostPort"] == "8080"
@@ -47,7 +59,7 @@ def test_torchserve_ports():
 def test_torchserve_access():
     try:
         url = get_inference_url(container) + "/ping"
-        response = requests.get(url)
+        response = requests.get(url, timeout=15)
         if response.status_code == 200:
             assert True
     except ConnectionError:
@@ -57,7 +69,7 @@ def test_torchserve_access():
 def test_health():
     try:
         url = get_inference_url(container) + "/ping"
-        response = requests.get(url)
+        response = requests.get(url, timeout=15)
         if response.json()["status"] == "Healthy":
             assert True
     except ConnectionError:
@@ -66,7 +78,7 @@ def test_health():
 
 def test_list_models():
     url = get_management_url(container) + "/models"
-    response = requests.get(url)
+    response = requests.get(url, timeout=15)
     assert response.json()["models"][0]["modelName"] == "cnn"
 
 
@@ -83,8 +95,16 @@ def test_scale_workers():
 def test_prediction():
 
     url = get_inference_url(container) + "/predictions/cnn"
-    file_1 = {"data": open(os.path.join(os.getcwd(), "torchserve", "tests", "test_data", "0.png"), "rb")}
-    file_2 = {"data": open(os.path.join(os.getcwd(), "torchserve", "tests", "test_data", "1.png"), "rb")}
+    file_1 = {
+        "data": open(
+            os.path.join(os.getcwd(), "torchserve", "tests", "test_data", "0.png"), "rb"
+        )
+    }
+    file_2 = {
+        "data": open(
+            os.path.join(os.getcwd(), "torchserve", "tests", "test_data", "1.png"), "rb"
+        )
+    }
     response = requests.post(url, files=file_1)
     prediction = response.json()
     assert prediction == 0
@@ -97,5 +117,5 @@ def test_prediction():
 def test_shutdown():
     container.stop()
     container.reload()
-    assert container.status == 'exited'
+    assert container.status == "exited"
     container.remove()

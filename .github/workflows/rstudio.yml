@@ -1,4 +1,4 @@
-name: Deploy TorchServe Image to GHCR
+name: Deploy RStudio Image to GHCR
 
 on:
   push:
@@ -15,14 +15,14 @@ jobs:
 
       - name: 'Build Inventory Image'
         run: |
-            docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
+            docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./rstudio
 
       - name: 'Run tests'
         env:
-          IMAGE_NAME: test-image
+          IMAGE_NAME: ghcr.io/scilifelabdatacentre/rstudio:latest
         run: | 
-          pip install -r ./torchserve/tests/requirements.txt
-          python3 -m pytest ./torchserve
+          pip install -r ./rstudio/tests/requirements.txt
+          python3 -m pytest ./rstudio
 
   push: 
     if: github.repository == 'scilifelabdatacentre/serve-images
@@ -48,5 +48,4 @@ jobs:
 
       - name: Push to GHCR
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./torchserve
           docker push ghcr.io/scilifelabdatacentre/rstudio:latest

@@ -4,21 +4,20 @@ on:
   push:
 
 jobs:
-  build-test-image:
+  build_and_test:
     runs-on: ubuntu-latest
-
+    
     steps:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-
-      - name: 'Build and tag test image'
+      - name: 'Build Inventory Image'
         run: |
-          docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
+            docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
 
       - name: 'Run tests'
         env:
           IMAGE_NAME: test-image
         run: | 
           pip install -r ./torchserve/tests/requirements.txt
-          python3 -m pytest ./torchserve/
+          python3 -m pytest ./torchserve
