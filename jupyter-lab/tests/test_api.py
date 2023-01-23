@@ -59,19 +59,6 @@ def test_jupyterlab_can_ping_container():
         assert False
 
 
-@pytest.mark.skip(reason="This test not working for jupyter-lab.")
-def test_health():
-    """Test that the basic ping call returns parseable json with status Healthy."""
-    try:
-        url = _get_inference_url(container) + "/ping"
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        assert response.status_code == 200, f"response status is {response.status_code}"
-        if response.json()["status"] == "Healthy":
-            assert True
-    except ConnectionError:
-        assert False
-
-
 def test_verify_test_files():
     """Verify that the test notebooks exist and can be accessed."""
     headers = {"Authorization": "Token {0}".format(TOKEN)}
