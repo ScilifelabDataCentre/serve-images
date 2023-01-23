@@ -21,6 +21,7 @@ jobs:
           image-ref: 'test-image'
           format: 'table'
           severity: 'CRITICAL,HIGH'
+          security-checks: 'vuln'
           exit-code: '1'
 
       - name: 'Run tests'
