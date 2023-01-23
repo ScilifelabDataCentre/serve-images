@@ -59,7 +59,7 @@ def test_torchserve_ports():
 def test_torchserve_access():
     try:
         url = get_inference_url(container) + "/ping"
-        response = requests.get(url)
+        response = requests.get(url, timeout=15)
         if response.status_code == 200:
             assert True
     except ConnectionError:
@@ -69,7 +69,7 @@ def test_torchserve_access():
 def test_health():
     try:
         url = get_inference_url(container) + "/ping"
-        response = requests.get(url)
+        response = requests.get(url, timeout=15)
         if response.json()["status"] == "Healthy":
             assert True
     except ConnectionError:
@@ -78,7 +78,7 @@ def test_health():
 
 def test_list_models():
     url = get_management_url(container) + "/models"
-    response = requests.get(url)
+    response = requests.get(url, timeout=15)
     assert response.json()["models"][0]["modelName"] == "cnn"
 
 
