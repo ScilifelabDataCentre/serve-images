@@ -4,14 +4,13 @@ LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/st
 USER root 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
-    && apt-get -yq install --no-install-recommends \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get -yq update \ 
-    && apt-get upgrade -yq \
-    && apt-get autoremove -yq && apt-get autoclean -yq \
+    && apt-get -yq upgrade  \
     && pip install --upgrade pip torch torchvision torchtext torchaudio future setuptools wheel \
-    && rm -rf /home/venv
+    && rm -rf /home/venv \
+    && apt-get autoremove -yq && apt-get autoclean -yq \ 
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /root/.gradle \
+    && chmod +x run_server.sh
 
 COPY run_server.sh run_server.sh
 RUN chmod +x run_server.sh
