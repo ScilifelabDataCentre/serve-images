@@ -1,5 +1,5 @@
 # TODO: change to latest
-FROM jupyter/minimal-notebook:python-3.8.8
+FROM jupyter/minimal-notebook:latest
 
 COPY tests/notebooks/basic.ipynb tests/basic.ipynb
 
