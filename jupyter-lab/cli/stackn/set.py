@@ -14,24 +14,22 @@ class AliasedGroup(click.Group):
         return super().get_command(ctx, cmd_name)
 
 
-@main.group('set', cls=AliasedGroup)
+@main.group("set", cls=AliasedGroup)
 def set():
     pass
 
 
-@set.command('current')
-@click.option('-p', '--project', required=False, default='')
-@click.option('-u', '--studio-url', required=False, default='')
-@click.option('--secure/--insecure', required=False, default=True)
+@set.command("current")
+@click.option("-p", "--project", required=False, default="")
+@click.option("-u", "--studio-url", required=False, default="")
+@click.option("--secure/--insecure", required=False, default=True)
 def setc(project, studio_url, secure):
     conf = {
-        'STACKN_PROJECT': project,
-        'STACKN_URL': studio_url,
-        'STACKN_SECURE': secure
+        "STACKN_PROJECT": project,
+        "STACKN_URL": studio_url,
+        "STACKN_SECURE": secure,
     }
     set_current(conf)
 
 
-ALIASES = {
-    "curr": setc
-}
+ALIASES = {"curr": setc}

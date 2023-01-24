@@ -1,13 +1,13 @@
 from setuptools import find_packages, setup
 
 setup(
-    name='stackn-cli',
-    version='0.3.0',
+    name="stackn-cli",
+    version="0.3.0",
     description="""Scaleout CLI""",
-    url='https://www.scaleoutsystems.com',
+    url="https://www.scaleoutsystems.com",
     include_package_data=True,
-    py_modules=['stackn'],
-    python_requires='>=3.6,<4',
+    py_modules=["stackn"],
+    python_requires=">=3.6,<4",
     install_requires=[
         "attrdict>=2.0.1",
         "certifi>=2018.11.29",
@@ -22,21 +22,19 @@ setup(
         "python-slugify",
         "prettytable",
         "pyjwt",
-        "psutil"
+        "psutil",
     ],
     license="Copyright Scaleout Systems AB. See license for details",
     zip_safe=False,
-    entry_points={
-        'console_scripts': ["stackn=stackn:main"]
-    },
-    keywords='',
+    entry_points={"console_scripts": ["stackn=stackn:main"]},
+    keywords="",
     packages=find_packages(exclude=["tests", "tests.*"]),
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6',
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
     ],
 )
