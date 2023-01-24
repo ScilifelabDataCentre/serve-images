@@ -1,9 +1,7 @@
-name: Deploy TorchServe Image to GHCR
+name: Torchserve workflow
 
 on:
   push:
-    branches:
-      - issue/11-torchserve-ghcr-workflow
 
 jobs:
   build_and_test:
@@ -13,7 +11,7 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Build Inventory Image'
+      - name: 'Build test image'
         run: |
             docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
 
@@ -35,7 +33,7 @@ jobs:
           python3 -m pytest ./torchserve
 
   push: 
-    if: ${{github.repository == 'scilifelabdatacentre/serve-images'}}$
+    if: ${{github.repository == 'scilifelabdatacentre/serve-images' && github.ref == 'refs/heads/main'}}$
     needs: build_and_test
     runs-on: ubuntu-latest
     concurrency:
@@ -46,17 +44,19 @@ jobs:
       packages: write
       
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: 'Checkout github action'
         uses: actions/checkout@main
 
-      - name: 'Login to GitHub Container Registry'
+      - name: 'Login to GHCR'
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Push to GHCR
+      - name: Build production image
         run: |
           docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+
+      - name: Push to GHCR
           docker push ghcr.io/scilifelabdatacentre/torchserve:latest

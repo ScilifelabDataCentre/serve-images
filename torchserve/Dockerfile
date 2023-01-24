@@ -1,7 +1,9 @@
 FROM pytorch/torchserve:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
+COPY run_server.sh run_server.sh
 USER root 
+
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
     && apt-get -yq upgrade  \
@@ -12,8 +14,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && rm -rf /root/.gradle \
     && chmod +x run_server.sh
 
-COPY run_server.sh run_server.sh
-RUN chmod +x /home/model-server/run_server.sh
 USER model-server
 
 ENTRYPOINT /home/model-server/run_server.sh
