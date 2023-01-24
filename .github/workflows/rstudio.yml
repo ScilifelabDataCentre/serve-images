@@ -32,7 +32,7 @@ jobs:
           python3 -m pytest ./rstudio
 
   push: 
-    if: ${{github.repository == 'scilifelabdatacentre/serve-images' && github.ref == 'refs/heads/main'}}$
+    #if: ${{github.repository == 'scilifelabdatacentre/serve-images' && github.ref == 'refs/heads/main'}}$
     needs: build_and_test
     runs-on: ubuntu-latest
     concurrency:
