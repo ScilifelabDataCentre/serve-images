@@ -1,0 +1,23 @@
+name: Build and test jupyter-lab image
+
+on:
+  push:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 'Checkout GitHub Action'
+        uses: actions/checkout@main
+
+      - name: 'Build Staging Image'
+        run: |
+            docker build -t test-image -f ./jupyter-lab/Dockerfile.test ./jupyter-lab
+
+      - name: 'Run tests'
+        env:
+          IMAGE_NAME: test-image
+        run: | 
+          pip install -r ./jupyter-lab/tests/requirements.txt
+          python3 -m pytest ./jupyter-lab
