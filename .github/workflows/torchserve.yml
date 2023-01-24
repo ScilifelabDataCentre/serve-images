@@ -58,5 +58,5 @@ jobs:
 
       - name: Push to GHCR
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./torchserve
-          docker push ghcr.io/scilifelabdatacentre/rstudio:latest
+          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+          docker push ghcr.io/scilifelabdatacentre/torchserve:latest
