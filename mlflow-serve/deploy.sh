@@ -1,0 +1,1 @@
+mlflow models serve -m models/model -h 0.0.0.0

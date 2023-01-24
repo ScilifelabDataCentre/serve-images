@@ -1,0 +1,7 @@
+uvicorn
+fastapi
+pydantic
+typing
+starlette
+prometheus-client
+python-multipart
