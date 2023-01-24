@@ -3,7 +3,7 @@ name: Deploy TorchServe Image to GHCR
 on:
   push:
     branches:
-      - main
+      - issue/11-torchserve-ghcr-workflow
 
 jobs:
   build_and_test:
@@ -25,7 +25,7 @@ jobs:
           python3 -m pytest ./torchserve
 
   push: 
-    if: github.repository == 'scilifelabdatacentre/serve-images
+    if: github.repository == 'scilifelabdatacentre/serve-images'
     needs: build_and_test
     runs-on: ubuntu-latest
     concurrency:
@@ -49,4 +49,3 @@ jobs:
       - name: Push to GHCR
         run: |
           docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./torchserve
-          docker push ghcr.io/scilifelabdatacentre/rstudio:latest
