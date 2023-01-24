@@ -1,9 +1,7 @@
-name: Deploy TorchServe Image to GHCR
+name: Torchserve workflow
 
 on:
   push:
-    branches:
-      - main
 
 jobs:
   build_and_test:
@@ -13,9 +11,19 @@ jobs:
       - name: 'Checkout GitHub Action'
         uses: actions/checkout@main
 
-      - name: 'Build Inventory Image'
+      - name: 'Build test image'
         run: |
             docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.7.1
+        with:
+          image-ref: 'test-image'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          security-checks: 'vuln'
+          timeout: '30m0s'
+          exit-code: '1'
 
       - name: 'Run tests'
         env:
@@ -25,7 +33,7 @@ jobs:
           python3 -m pytest ./torchserve
 
   push: 
-    if: github.repository == 'scilifelabdatacentre/serve-images
+    if: ${{github.ref == 'refs/heads/main'}}
     needs: build_and_test
     runs-on: ubuntu-latest
     concurrency:
@@ -36,17 +44,20 @@ jobs:
       packages: write
       
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: 'Checkout github action'
         uses: actions/checkout@main
 
-      - name: 'Login to GitHub Container Registry'
+      - name: 'Login to GHCR'
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
+      - name: Build production image
+        run: |
+          docker build -t ghcr.io/scilifelabdatacentre/torchserve:latest ./torchserve
+
       - name: Push to GHCR
         run: |
-          docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./torchserve
-          docker push ghcr.io/scilifelabdatacentre/rstudio:latest
+          docker push ghcr.io/scilifelabdatacentre/torchserve:latest
