@@ -1,0 +1,7 @@
+gunicorn
+dash
+pandas
+pandas_datareader
+watchdog
+pyyaml
+argh
