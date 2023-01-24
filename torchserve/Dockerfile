@@ -13,7 +13,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && chmod +x run_server.sh
 
 COPY run_server.sh run_server.sh
-RUN chmod +x run_server.sh
+RUN chmod +x /home/model-server/run_server.sh
 USER model-server
 
 ENTRYPOINT /home/model-server/run_server.sh
