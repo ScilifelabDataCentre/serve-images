@@ -2,16 +2,33 @@ name: Jupyter-lab workflow
 
 on:
   push:
+    paths:
+      - "jupyter-lab/*"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Manual run'
+        required: false
+        type: boolean
 
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 'Checkout GitHub Action'
+      - name: Checkout GitHub Action
         uses: actions/checkout@main
 
-      - name: 'Build test image'
+      - name: Build test image
         run: |
             docker build -t test-image -f ./jupyter-lab/Dockerfile.test ./jupyter-lab
 
@@ -25,7 +42,7 @@ jobs:
           timeout: '30m0s'
           exit-code: '1'
 
-      - name: 'Run tests'
+      - name: Run tests
         env:
           IMAGE_NAME: test-image
         run: | 
@@ -46,20 +63,22 @@ jobs:
       packages: write
       
     steps:
-      - name: 'Checkout github action'
+      - name: Checkout github action
         uses: actions/checkout@main
 
-      - name: 'Login to GHCR'
+      - name: Login to GHCR
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Build production image
-        run: |
-          docker build -t ghcr.io/scilifelabdatacentre/jupyter-lab:latest ./jupyter-lab
-
-      - name: Push to GHCR
-        run: |
-          docker push ghcr.io/scilifelabdatacentre/jupyter-lab:latest
+      - name: Publish image to GHCR
+        uses: docker/build-push-action@v3
+        with:
+          file: jupyter-lab/Dockerfile
+          context: .
+          push: true
+          build-args: version=${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
