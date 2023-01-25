@@ -4,7 +4,7 @@ FROM jupyter/minimal-notebook:latest
 COPY tests/notebooks/basic.ipynb tests/basic.ipynb
 
 USER root
-RUN apt-get update && apt-get install -y
+RUN apt-get update && apt-get install curl -y
 
 USER $NB_UID
 RUN pip install mlflow boto3

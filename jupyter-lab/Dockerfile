@@ -2,7 +2,7 @@ FROM jupyter/minimal-notebook:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
 USER root
-RUN apt-get update && apt-get install -y
+RUN apt-get update && apt-get install curl -y
 
 COPY cli /home/jovyan/cli
 COPY examples /home/jovyan/work/examples
