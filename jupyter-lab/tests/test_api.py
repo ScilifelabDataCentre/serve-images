@@ -1,6 +1,6 @@
-import os
+"""Tests of the jupyter-lab image using API calls."""
 
-# import random as rnd
+import os
 import time
 import datetime
 import uuid

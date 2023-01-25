@@ -3,7 +3,7 @@ name: Jupyter-lab workflow
 on:
   push:
     paths:
-      - "jupyter-lab/*"
+      - "jupyter-lab/**"
   workflow_dispatch:
     inputs:
       logLevel:
