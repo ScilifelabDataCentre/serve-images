@@ -58,10 +58,12 @@ jobs:
           username: ${{github.actor}}
           password: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Build production image
-        run: |
-          docker build -t ghcr.io/scilifelabdatacentre/jupyter-lab:latest ./jupyter-lab
-
-      - name: Push to GHCR
-        run: |
-          docker push ghcr.io/scilifelabdatacentre/jupyter-lab:latest
+      - name: Publish image to GHCR
+        uses: docker/build-push-action@v3
+        with:
+          file: jupyter-lab/Dockerfile
+          context: .
+          push: true
+          build-args: version=${{ github.ref_name }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
