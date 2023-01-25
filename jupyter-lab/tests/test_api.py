@@ -1,3 +1,5 @@
+"""Tests of the jupyter-lab image using API calls."""
+
 import os
 import time
 import datetime
