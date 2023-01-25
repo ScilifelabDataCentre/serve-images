@@ -1,5 +1,5 @@
 # Serve-images
-This repository handles all the images for Serve. 
+This repository handles all the images for [Serve](https://github.com/ScilifelabDataCentre/stackn). 
 The pipeline for an images goes as follows:
 1. Build image
 2. Scan for security issues. 
@@ -21,7 +21,9 @@ In this repo, we work [Trunk based](https://www.toptal.com/software/trunk-based-
 ```
 serve-images
 │   README.md
-│   .gitignore    
+│   .gitignore
+|   .github/workflows
+|   ...
 │
 └───image1
 │   │   Dockerfile
@@ -35,7 +37,11 @@ serve-images
 │       │   ...
 │   
 └───image2
-    │   ...
+│   │   Dockerfile
+│   │   run_script.sh
+│   │
+│   └───tests
+|       |   ...
 
 ```
 
