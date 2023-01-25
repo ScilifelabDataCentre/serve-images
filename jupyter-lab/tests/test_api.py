@@ -1,6 +1,4 @@
 import os
-
-# import random as rnd
 import time
 import datetime
 import uuid
