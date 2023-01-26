@@ -72,7 +72,7 @@ jobs:
         with:
           images: ghcr.io/scilifelabdatacentre/jupyter-lab
           tags: |
-            type=raw,value={{date 'YYYYMMDD'}}
+            type=raw,value={{date 'YYMMDD-HHmm', tz='Europe/Stockholm'}}
 
       - name: Login to GHCR
         uses: docker/login-action@v1
