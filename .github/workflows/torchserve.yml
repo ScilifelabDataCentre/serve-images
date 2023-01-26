@@ -2,6 +2,8 @@ name: Torchserve workflow
 
 on:
   push:
+    paths:
+      - "torchserve/**"
 
 jobs:
   build_and_test:
