@@ -85,7 +85,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           file: jupyter-lab/Dockerfile
-          context: .
+          context: ./jupyter-lab
           push: true
           build-args: version=${{ github.ref_name }}
           tags: ${{ steps.meta.outputs.tags }}
