@@ -18,7 +18,7 @@ EXPERIMENT_NAME = "Exp123"
 
 client = docker.from_env()
 container = client.containers.run(
-    image="mlflow",
+    image=os.environ["test-image"],
     command='/bin/bash -c "mlflow server --host {} --port {} --backend-store-uri {}"'.format(
         "0.0.0.0", PORT, STORAGE_PATH
     ),
