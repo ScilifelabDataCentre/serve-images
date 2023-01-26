@@ -1,9 +1,11 @@
+"""Tests of the torchserve image."""
+
 import os
-import pytest
+import time
+import random as rnd
 import requests
 from requests.exceptions import ConnectionError
-import random as rnd
-import time
+import pytest
 import docker
 
 

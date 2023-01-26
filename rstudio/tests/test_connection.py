@@ -1,7 +1,10 @@
-import requests
-import time
-import docker
+"""Tests of the rstudio image."""
+
 import os
+import time
+import requests
+import docker
+
 
 # Settings
 PORT = 8787  # the RStudio port
