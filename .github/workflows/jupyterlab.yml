@@ -80,5 +80,5 @@ jobs:
           context: ./jupyter-lab
           push: true
           build-args: version=${{ github.ref_name }}
-          tags: jupyter-lab:latest
+          tags: ghcr.io/scilifelabdatacentre/jupyter-lab:latest
           labels: ${{ steps.meta.outputs.labels }}
