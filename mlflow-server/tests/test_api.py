@@ -88,9 +88,13 @@ def test_get_run():
         timeout=TIMEOUT_CALL,
     )
     assert response.json()["runs"][0]["data"]["params"][0]["key"] == "test_param"
-    assert response.json()["runs"][0]["data"]["params"][0]["value"] == "1.0" # Params returns string
+    assert (
+        response.json()["runs"][0]["data"]["params"][0]["value"] == "1.0"
+    )  # Params returns string
     assert response.json()["runs"][0]["data"]["metrics"][0]["key"] == "test_metric"
-    assert response.json()["runs"][0]["data"]["metrics"][0]["value"] == 0.1 # Metric returns double
+    assert (
+        response.json()["runs"][0]["data"]["metrics"][0]["value"] == 0.1
+    )  # Metric returns double
 
 
 def test_shutdown():
