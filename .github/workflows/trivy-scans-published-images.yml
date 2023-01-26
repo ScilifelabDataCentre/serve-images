@@ -1,0 +1,43 @@
+# Trivy scans of published images
+# ---------------------------------
+name: Trivy scans of published images
+
+on:
+  schedule:
+    # Runs "At 8:00 on every day-of-week from Monday through Friday"
+    - cron: "0 8 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Manual run'
+        required: false
+        type: boolean
+
+jobs:
+  scan:
+    permissions:
+      contents: read
+      security-events: write
+
+    name: Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.7.1
+        with:
+          image-ref: "ghcr.io/scilifelabdatacentre/jupyter-lab:latest"
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          security-checks: 'vuln'
+          timeout: '30m0s'
+          exit-code: '1'
