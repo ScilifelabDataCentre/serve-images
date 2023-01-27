@@ -14,7 +14,6 @@ test_model = importlib.import_module("mlflow-serve.tests.test_model", None)
 PORT = 5000  # MLFlow port
 TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 STORAGE_PATH = "/home/{}/mlruns".format("jovyan")
-EXPERIMENT_NAME = "Exp123"
 
 client = docker.from_env()
 container = client.containers.run(
