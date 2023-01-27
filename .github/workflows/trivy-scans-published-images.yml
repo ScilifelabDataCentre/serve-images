@@ -46,7 +46,8 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-jupyterlab-latest.sarif"
-          category: trivy
+          # assigns a category for results in the SARIF file
+          category: trivy-jupyter-lab
 
 
       - name: Run Trivy vulnerability scanner on rstudio:latest
@@ -64,7 +65,8 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-rstudio-latest.sarif"
-          category: trivy
+          # assigns a category for results in the SARIF file
+          category: trivy-rstudio
 
 
       - name: Run Trivy vulnerability scanner on torchserve:latest
@@ -82,7 +84,8 @@ jobs:
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-torchserve-latest.sarif"
-          category: trivy
+          # assigns a category for results in the SARIF file
+          category: trivy-torchserver
 
 
       - name: Run Trivy vulnerability scanner on mlflow-server:latest
@@ -90,14 +93,15 @@ jobs:
         with:
           image-ref: "ghcr.io/scilifelabdatacentre/mlflow-server:latest"
           format: "sarif"
-          output: "trivy-results-mlflowserver-latest.sarif"
+          output: "trivy-results-mlflow-server-latest.sarif"
           severity: "CRITICAL,HIGH"
           security-checks: 'vuln'
           timeout: '30m0s'
           exit-code: '1'
 
-      - name: Upload Trivy scan results to GitHub Security tab for mlflowserver:latest
+      - name: Upload Trivy scan results to GitHub Security tab for mlflow-server:latest
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: "trivy-results-mlflowserver-latest.sarif"
-          category: trivy
+          sarif_file: "trivy-results-mlflow-server-latest.sarif"
+          # assigns a category for results in the SARIF file
+          category: trivy-mlflow-server
