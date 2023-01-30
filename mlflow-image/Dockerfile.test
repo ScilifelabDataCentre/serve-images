@@ -26,3 +26,5 @@ RUN pip install --upgrade --no-cache-dir pip setuptools \
 
 WORKDIR $HOME 
 USER $USER
+
+COPY tests/mlrun_example.py mlrun_example.py
