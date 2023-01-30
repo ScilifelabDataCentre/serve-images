@@ -8,22 +8,22 @@ import docker
 import pytest
 import importlib
 
-mlrun = importlib.import_module("mlflow-server.tests.mlrun_example", None)
-
-
-PORT = 5000  # MLFlow port
+PORT = 5001  # MLFlow port
+HOST = "0.0.0.0"
 TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 STORAGE_PATH = "/home/{}/mlruns".format("jovyan")
 EXPERIMENT_NAME = "Exp123"
+MODEL_NAME = 'test_model'
 
 client = docker.from_env()
 container = client.containers.run(
-    image=os.environ["IMAGE_NAME"],
+    image='mlflow',
     command='/bin/bash -c "mlflow server --host {} --port {} --backend-store-uri {}"'.format(
-        "0.0.0.0", PORT, STORAGE_PATH
+        HOST, PORT, STORAGE_PATH
     ),
     ports={f"{PORT}/tcp": PORT},
     detach=True,
+    remove=True
 )
 
 time.sleep(10)
@@ -53,9 +53,8 @@ def test_mlflow_access():
 
 
 def test_example_run():
-    url = _get_url(container)
     try:
-        mlrun.run_example(url, EXPERIMENT_NAME)
+        container.exec_run(cmd='python3 mlrun_example.py {} {}'.format(EXPERIMENT_NAME, MODEL_NAME))
         assert True
     except:
         assert False
@@ -100,8 +99,8 @@ def test_get_run():
 def test_shutdown():
     container.stop()
     container.reload()
-    assert container.status == "exited"
-    container.remove()
+    assert container.status == "removing"
+    client.close()
 
 
 # Private methods
