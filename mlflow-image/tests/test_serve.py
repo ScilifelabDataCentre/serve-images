@@ -17,7 +17,7 @@ MODEL_NAME = "test_model"
 
 client = docker.from_env()
 container = client.containers.run(
-    image=os.environ['IMAGE_NAME'],
+    image=os.environ["IMAGE_NAME"],
     command='/bin/bash -c "python3 mlrun_example.py {} {}  && mlflow models serve -m {} --host {} --port {} --env-manager local"'.format(
         EXPERIMENT_NAME, MODEL_NAME, MODELPATH, HOST, PORT
     ),

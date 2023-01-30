@@ -17,7 +17,7 @@ MODEL_NAME = "test_model"
 
 client = docker.from_env()
 container = client.containers.run(
-    image=os.environ['IMAGE_NAME'],
+    image=os.environ["IMAGE_NAME"],
     command='/bin/bash -c "mlflow server --host {} --port {} --backend-store-uri {}"'.format(
         HOST, PORT, STORAGE_PATH
     ),
