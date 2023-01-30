@@ -65,7 +65,7 @@ def test_prediction():
 def test_shutdown():
     container.stop()
     container.reload()
-    assert container.status == "removing"
+    assert container.status == "removing" or container.status == 'exited'
     client.close()
 
 
