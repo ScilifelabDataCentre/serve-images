@@ -3,7 +3,8 @@ import mlflow
 import numpy as np
 import sys
 
-def run_example(experiment_name, model_name='test_model'):
+
+def run_example(experiment_name, model_name="test_model"):
 
     mlflow.set_experiment(experiment_name)
 
@@ -26,5 +27,5 @@ def run_example(experiment_name, model_name='test_model'):
     mlflow.end_run()
 
 
-if __name__ == '__main__':
-    run_example(experiment_name = sys.argv[1], model_name = sys.argv[2])
+if __name__ == "__main__":
+    run_example(experiment_name=sys.argv[1], model_name=sys.argv[2])

@@ -8,26 +8,27 @@ import docker
 import pytest
 
 PORT = 5000  # MLFlow port
-HOST = '0.0.0.0'
+HOST = "0.0.0.0"
 USER = "jovyan"
 MODELPATH = "/home/{}/test_model".format(USER)
 TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 EXPERIMENT_NAME = "Exp123"
-MODEL_NAME = 'test_model'
+MODEL_NAME = "test_model"
 
 client = docker.from_env()
 container = client.containers.run(
-    image='mlflow',
+    image="mlflow",
     command='/bin/bash -c "python3 mlrun_example.py {} {}  && mlflow models serve -m {} --host {} --port {} --env-manager local"'.format(
         EXPERIMENT_NAME, MODEL_NAME, MODELPATH, HOST, PORT
     ),
     ports={f"{PORT}/tcp": PORT},
     detach=True,
-    remove=True
+    remove=True,
 )
 
 time.sleep(10)
 container.reload()
+
 
 def test_container_status():
     """Test that the MLFlow container is running."""
@@ -50,12 +51,16 @@ def test_mlflow_access():
     except ConnectionError:
         assert False
 
+
 def test_prediction():
     """Test of a basic prediction using the LogisticRegression model created in 'mlrun_example.py"""
     headers = {"Content-Type": "application/json; charset=utf-8"}
     data = '{"dataframe_split": {"columns": ["X"],"data": [-2, -1, 0, 1, 2, 1]}}'
-    response = requests.post('http://{}:{}/invocations'.format(HOST, PORT),data=data, headers=headers).json()
-    assert all([x==y for x,y in zip(response['predictions'], [0,0,0,1,1,1])])
+    response = requests.post(
+        "http://{}:{}/invocations".format(HOST, PORT), data=data, headers=headers
+    ).json()
+    assert all([x == y for x, y in zip(response["predictions"], [0, 0, 0, 1, 1, 1])])
+
 
 def test_shutdown():
     container.stop()
