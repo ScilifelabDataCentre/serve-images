@@ -22,7 +22,7 @@ container = client.containers.run(
         EXPERIMENT_NAME, MODEL_NAME, MODELPATH, HOST, PORT
     ),
     ports={f"{PORT}/tcp": PORT},
-    detach=True
+    detach=True,
 )
 
 time.sleep(10)
@@ -64,7 +64,7 @@ def test_prediction():
 def test_shutdown():
     container.stop()
     container.reload()
-    assert container.status == "removing" or container.status == 'exited'
+    assert container.status == "removing" or container.status == "exited"
     container.remove()
     client.close()
 

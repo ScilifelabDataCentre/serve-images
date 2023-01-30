@@ -22,7 +22,7 @@ container = client.containers.run(
         HOST, PORT, STORAGE_PATH
     ),
     ports={f"{PORT}/tcp": PORT},
-    detach=True
+    detach=True,
 )
 
 time.sleep(10)
@@ -100,7 +100,7 @@ def test_get_run():
 def test_shutdown():
     container.stop()
     container.reload()
-    assert container.status == "removing" or container.status == 'exited'
+    assert container.status == "removing" or container.status == "exited"
     container.remove()
     client.close()
 
