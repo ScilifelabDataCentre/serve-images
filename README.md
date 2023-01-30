@@ -2,9 +2,10 @@
 This repository handles all the images for [Serve](https://github.com/ScilifelabDataCentre/stackn). 
 The pipeline for an image goes as follows:
 1. Build image
-2. Scan for security issues 
+2. Scan for security issues
 3. If secure, run tests to make sure that the image works as expected
-4. If passed, push the image to GHCR 
+4. If passed, push the image to GHCR
+5. Run scheduled security scans of the version of the image that is used in production by Serve. This Trivy worklow must be maintained with the current list of images.
 
 So for instance, our torchserve image is build like this
 1. Pull torchserve:latest, update system and some python versions, build image
