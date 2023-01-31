@@ -1,11 +1,13 @@
 FROM ubuntu:20.04
 
 ENV USER=jovyan
+ENV HOME=/home/$USER
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
     && apt-get -yq install \
         curl \
+        git \
         python3 \
         python3-pip \
         python3-distutils \ 
@@ -15,17 +17,12 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && rm -rf /var/lib/apt/lists/* 
 
 RUN useradd -m $USER \
-    && mkdir -p home/$USER/mlruns \
-    && chown -R $USER:$USER home/$USER/mlruns
+    && mkdir -p $HOME/mlruns \
+    && chown -R $USER:$USER $HOME/mlruns
 
-COPY deploy.sh deploy.sh
-RUN chmod +x deploy.sh
+RUN pip install --upgrade --no-cache-dir pip setuptools \
+    && pip install --no-cache-dir mlflow boto3 \
+    && pip install --no-cache-dir --upgrade numba
 
-RUN pip install --upgrade pip setuptools \
-    && pip install mlflow boto3 \
-    && pip install --upgrade numba 
-
-WORKDIR /home/$USER
+WORKDIR $HOME 
 USER $USER
-
-CMD ["./deploy.sh"]

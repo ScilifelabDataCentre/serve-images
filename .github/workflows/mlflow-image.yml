@@ -1,9 +1,9 @@
-name: MLFlow server workflow
+name: MLFlow workflow
 
 on:
   push:
     paths:
-      - "mlflow-server/**"
+      - "mlflow-image/**"
 
 jobs:
   build_and_test:
@@ -15,7 +15,7 @@ jobs:
 
       - name: 'Build test image'
         run: |
-            docker build -t test-image -f ./mlflow-server/Dockerfile ./mlflow-server
+            docker build -t test-image -f ./mlflow-image/Dockerfile.test ./mlflow-image
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
@@ -31,8 +31,8 @@ jobs:
         env:
           IMAGE_NAME: test-image
         run: | 
-          pip install -r ./mlflow-server/tests/requirements.txt
-          python3 -m pytest ./mlflow-server
+          pip install -r ./mlflow-image/tests/requirements.txt
+          python3 -m pytest ./mlflow-image
 
   push: 
     if: | 
@@ -55,7 +55,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/mlflow-server
+          images: ghcr.io/scilifelabdatacentre/mlflow-image
           tags: |
             type=raw,value={{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -69,11 +69,11 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./mlflow-server/Dockerfile
-          context: ./mlflow-server
+          file: ./mlflow-image/Dockerfile
+          context: ./mlflow-image
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/mlflow-server:latest
+            ghcr.io/scilifelabdatacentre/mlflow-image:latest
           labels: ${{ steps.meta.outputs.labels }}

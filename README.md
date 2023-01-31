@@ -61,6 +61,11 @@ $ ./dev_scripts/run_jupyterlab.sh
 ```
 
 ```
+$ chmod +x ./dev_scripts/run_mlflow.sh
+$ ./dev_scripts/run_mlflow.sh
+```
+
+```
 $ chmod +x ./dev_scripts/run_rstudio.sh
 $ ./dev_scripts/run_rstudio.sh
 ```
