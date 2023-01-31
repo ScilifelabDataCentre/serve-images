@@ -88,20 +88,20 @@ jobs:
           category: trivy-torchserver
 
 
-      - name: Run Trivy vulnerability scanner on mlflow-server:latest
+      - name: Run Trivy vulnerability scanner on mlflow-image:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/mlflow-server:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/mlflow-image:latest"
           format: "sarif"
-          output: "trivy-results-mlflow-server-latest.sarif"
+          output: "trivy-results-mlflow-image-latest.sarif"
           severity: "CRITICAL,HIGH"
           security-checks: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 
-      - name: Upload Trivy scan results to GitHub Security tab for mlflow-server:latest
+      - name: Upload Trivy scan results to GitHub Security tab for mlflow-image:latest
         uses: github/codeql-action/upload-sarif@v2
         with:
-          sarif_file: "trivy-results-mlflow-server-latest.sarif"
+          sarif_file: "trivy-results-mlflow-image-latest.sarif"
           # assigns a category for results in the SARIF file
-          category: trivy-mlflow-server
+          category: trivy-mlflow-image
