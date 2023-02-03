@@ -76,6 +76,7 @@ def test_shutdown():
     container.remove()
     client.close()
 
+
 # Private methods
 
 
