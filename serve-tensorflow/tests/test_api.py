@@ -7,6 +7,8 @@ import requests
 from requests.exceptions import ConnectionError
 import pytest
 import docker
+import json
+import numpy as np
 
 
 # Settings
@@ -61,12 +63,14 @@ def test_health():
 
 
 def test_prediction():
-    """Verify that the CNN model can be accessed."""
-    data = '{"instances": [1.0, 2.0, 5.0]}'
-    answer = [2.5, 3.0, 4.5]
+    """Verify that the model can be used for predictions.
+        The models divides input by 2 and adds 2"""
+    data = np.random.randn(50)
+    data_dict = {}
+    data_dict["instances"] = list(data)
     url = _get_api_url(container) + "/v1/models/model:predict"
-    response = requests.post(url, data=data, timeout=TIMEOUT_CALL)
-    assert all(x == y for x, y in zip(response.json()["predictions"], answer))
+    response = requests.post(url, data=json.dumps(data_dict), timeout=TIMEOUT_CALL)
+    assert all(np.isclose(x/2+2,y) for x, y in zip(data, response.json()["predictions"]))
 
 
 def test_shutdown():
@@ -75,7 +79,6 @@ def test_shutdown():
     assert container.status == "removing" or container.status == "exited"
     container.remove()
     client.close()
-
 
 # Private methods
 
