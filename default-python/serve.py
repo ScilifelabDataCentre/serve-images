@@ -65,7 +65,6 @@ class PromMiddleware(BaseHTTPMiddleware):
 
 
 def metrics(request):
-
     registry = REGISTRY
     if "prometheus_multiproc_dir" in os.environ:
         registry = CollectorRegistry()

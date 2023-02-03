@@ -5,7 +5,6 @@ import sys
 
 
 def run_example(experiment_name, model_name="test_model"):
-
     mlflow.set_experiment(experiment_name)
 
     X = np.array([-2, -1, 0, 1, 2, 1]).reshape(-1, 1)
