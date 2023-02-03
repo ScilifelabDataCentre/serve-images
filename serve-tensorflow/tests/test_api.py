@@ -64,13 +64,15 @@ def test_health():
 
 def test_prediction():
     """Verify that the model can be used for predictions.
-        The models divides input by 2 and adds 2"""
+    The models divides input by 2 and adds 2"""
     data = np.random.randn(50)
     data_dict = {}
     data_dict["instances"] = list(data)
     url = _get_api_url(container) + "/v1/models/model:predict"
     response = requests.post(url, data=json.dumps(data_dict), timeout=TIMEOUT_CALL)
-    assert all(np.isclose(x/2+2,y) for x, y in zip(data, response.json()["predictions"]))
+    assert all(
+        np.isclose(x / 2 + 2, y) for x, y in zip(data, response.json()["predictions"])
+    )
 
 
 def test_shutdown():
@@ -79,6 +81,7 @@ def test_shutdown():
     assert container.status == "removing" or container.status == "exited"
     container.remove()
     client.close()
+
 
 # Private methods
 
