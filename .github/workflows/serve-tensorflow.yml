@@ -1,4 +1,4 @@
-name: serve-tensorflow workflow
+name: Serve-Tensorflow workflow
 
 on:
   push:
