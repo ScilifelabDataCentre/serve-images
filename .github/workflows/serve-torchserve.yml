@@ -1,9 +1,9 @@
-name: Torchserve workflow
+name: Serve-Torchserve workflow
 
 on:
   push:
     paths:
-      - "torchserve/**"
+      - "serve-torchserve/**"
 
 jobs:
   build_and_test:
@@ -15,7 +15,7 @@ jobs:
 
       - name: 'Build test image'
         run: |
-            docker build -t test-image -f ./torchserve/Dockerfile.test ./torchserve
+            docker build -t test-image -f ./serve-torchserve/Dockerfile.test ./serve-torchserve
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
@@ -31,8 +31,8 @@ jobs:
         env:
           IMAGE_NAME: test-image
         run: | 
-          pip install -r ./torchserve/tests/requirements.txt
-          python3 -m pytest ./torchserve
+          pip install -r ./serve-torchserve/tests/requirements.txt
+          python3 -m pytest ./serve-torchserve
 
   push: 
     if: | 
@@ -55,7 +55,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/torchserve
+          images: ghcr.io/scilifelabdatacentre/serve-torchserve
           tags: |
             type=raw,value={{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -69,11 +69,11 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./torchserve/Dockerfile
-          context: ./torchserve
+          file: ./serve-torchserve/Dockerfile
+          context: ./serve-torchserve
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/torchserve:latest
+            ghcr.io/scilifelabdatacentre/serve-torchserve:latest
           labels: ${{ steps.meta.outputs.labels }}

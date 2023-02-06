@@ -15,7 +15,7 @@ jobs:
 
       - name: 'Build test image'
         run: |
-            docker build -t ghcr.io/scilifelabdatacentre/serve-rstudio:latest ./rstudio
+            docker build -t ghcr.io/scilifelabdatacentre/serve-rstudio:latest ./serve-rstudio
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
