@@ -82,12 +82,18 @@ def test_prediction():
     url = _get_inference_url(container) + "/predictions/cnn"
     file_1 = {
         "data": open(
-            os.path.join(os.getcwd(), "serve-torchserve", "tests", "test_data", "0.png"), "rb"
+            os.path.join(
+                os.getcwd(), "serve-torchserve", "tests", "test_data", "0.png"
+            ),
+            "rb",
         )
     }
     file_2 = {
         "data": open(
-            os.path.join(os.getcwd(), "serve-torchserve", "tests", "test_data", "1.png"), "rb"
+            os.path.join(
+                os.getcwd(), "serve-torchserve", "tests", "test_data", "1.png"
+            ),
+            "rb",
         )
     }
     response = requests.post(url, files=file_1)
