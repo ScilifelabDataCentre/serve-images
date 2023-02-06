@@ -107,4 +107,5 @@ RUN mkdir -p /tmp_home \
 
 USER ${NB_UID}
 EXPOSE 8787
+
 ENTRYPOINT ["/init"]
