@@ -1,9 +1,11 @@
+#!/usr/bin/env python3
+"""Tests of the mlflow image using API calls."""
+
 import os
-import pytest
+import time
+import random as rnd
 import requests
 from requests.exceptions import ConnectionError
-import random as rnd
-import time
 import docker
 import pytest
 
