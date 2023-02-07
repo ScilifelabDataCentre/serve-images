@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+"""Sample mlflow experiment used for testing."""
+
+import sys
 from sklearn.linear_model import LogisticRegression
 import mlflow
 import numpy as np
-import sys
 
 
 def run_example(experiment_name, model_name="test_model"):
