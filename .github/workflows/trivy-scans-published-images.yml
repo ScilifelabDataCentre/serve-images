@@ -31,10 +31,10 @@ jobs:
     name: Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Run Trivy vulnerability scanner on serve-jupyter:latest
+      - name: Run Trivy vulnerability scanner on serve-jupyterlab:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/serve-jupyter:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/serve-jupyterlab:latest"
           format: "sarif"
           output: "trivy-results-jupyterlab-latest.sarif"
           severity: "CRITICAL,HIGH"
