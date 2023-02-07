@@ -1,9 +1,9 @@
-name: RStudio workflow
+name: Serve-Torchserve workflow
 
 on:
   push:
     paths:
-      - "rstudio/**"
+      - "serve-torchserve/**"
 
 jobs:
   build_and_test:
@@ -15,23 +15,24 @@ jobs:
 
       - name: 'Build test image'
         run: |
-            docker build -t ghcr.io/scilifelabdatacentre/rstudio:latest ./rstudio
+            docker build -t test-image -f ./serve-torchserve/Dockerfile.test ./serve-torchserve
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: 'ghcr.io/scilifelabdatacentre/rstudio:latest'
+          image-ref: 'test-image'
           format: 'table'
           severity: 'CRITICAL,HIGH'
+          security-checks: 'vuln'
           timeout: '30m0s'
           exit-code: '1'
 
       - name: 'Run tests'
         env:
-          IMAGE_NAME: ghcr.io/scilifelabdatacentre/rstudio:latest
+          IMAGE_NAME: test-image
         run: | 
-          pip install -r ./rstudio/tests/requirements.txt
-          python3 -m pytest ./rstudio
+          pip install -r ./serve-torchserve/tests/requirements.txt
+          python3 -m pytest ./serve-torchserve
 
   push: 
     if: | 
@@ -54,7 +55,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/rstudio
+          images: ghcr.io/scilifelabdatacentre/serve-torchserve
           tags: |
             type=raw,value={{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -68,11 +69,11 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./rstudio/Dockerfile
-          context: ./rstudio
+          file: ./serve-torchserve/Dockerfile
+          context: ./serve-torchserve
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/rstudio:latest
+            ghcr.io/scilifelabdatacentre/serve-torchserve:latest
           labels: ${{ steps.meta.outputs.labels }}

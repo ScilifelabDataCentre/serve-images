@@ -19,8 +19,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
     && apt-get -yq install --no-install-recommends \
       apt-transport-https \
-      bash \
-      bzip2 \
       ca-certificates \
       curl \
       git \
@@ -37,7 +35,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       zip \
       dpkg-sig \
       libapparmor1 \
-      libc6 \
       libclang-dev \
       libedit2 \
       libpq5 \
@@ -110,4 +107,5 @@ RUN mkdir -p /tmp_home \
 
 USER ${NB_UID}
 EXPOSE 8787
+
 ENTRYPOINT ["/init"]

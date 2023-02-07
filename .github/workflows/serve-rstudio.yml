@@ -1,9 +1,9 @@
-name: MLFlow workflow
+name: Serve-RStudio workflow
 
 on:
   push:
     paths:
-      - "mlflow-image/**"
+      - "serve-rstudio/**"
 
 jobs:
   build_and_test:
@@ -15,24 +15,23 @@ jobs:
 
       - name: 'Build test image'
         run: |
-            docker build -t test-image -f ./mlflow-image/Dockerfile.test ./mlflow-image
+            docker build -t ghcr.io/scilifelabdatacentre/serve-rstudio:latest ./serve-rstudio
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: 'test-image'
+          image-ref: 'ghcr.io/scilifelabdatacentre/serve-rstudio:latest'
           format: 'table'
           severity: 'CRITICAL,HIGH'
-          security-checks: 'vuln'
           timeout: '30m0s'
           exit-code: '1'
 
       - name: 'Run tests'
         env:
-          IMAGE_NAME: test-image
+          IMAGE_NAME: ghcr.io/scilifelabdatacentre/serve-rstudio:latest
         run: | 
-          pip install -r ./mlflow-image/tests/requirements.txt
-          python3 -m pytest ./mlflow-image
+          pip install -r ./serve-rstudio/tests/requirements.txt
+          python3 -m pytest ./serve-rstudio
 
   push: 
     if: | 
@@ -55,7 +54,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/mlflow-image
+          images: ghcr.io/scilifelabdatacentre/serve-rstudio
           tags: |
             type=raw,value={{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -69,11 +68,11 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./mlflow-image/Dockerfile
-          context: ./mlflow-image
+          file: ./serve-rstudio/Dockerfile
+          context: ./serve-rstudio
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/mlflow-image:latest
+            ghcr.io/scilifelabdatacentre/serve-rstudio:latest
           labels: ${{ steps.meta.outputs.labels }}
