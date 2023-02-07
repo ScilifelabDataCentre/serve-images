@@ -31,10 +31,10 @@ jobs:
     name: Checks
     runs-on: ubuntu-latest
     steps:
-      - name: Run Trivy vulnerability scanner on jupyter-lab:latest
+      - name: Run Trivy vulnerability scanner on serve-jupyter:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/jupyter-lab:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/serve-jupyter:latest"
           format: "sarif"
           output: "trivy-results-jupyterlab-latest.sarif"
           severity: "CRITICAL,HIGH"
@@ -42,7 +42,7 @@ jobs:
           timeout: '30m0s'
           exit-code: '0'
 
-      - name: Upload Trivy scan results to GitHub Security tab for jupyter-lab:latest
+      - name: Upload Trivy scan results to GitHub Security tab for jupyter-lab
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-jupyterlab-latest.sarif"
@@ -50,10 +50,10 @@ jobs:
           category: trivy-jupyter-lab
 
 
-      - name: Run Trivy vulnerability scanner on rstudio:latest
+      - name: Run Trivy vulnerability scanner on serve-rstudio:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/rstudio:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/serve-rstudio:latest"
           format: "sarif"
           output: "trivy-results-rstudio-latest.sarif"
           severity: "CRITICAL,HIGH"
@@ -61,7 +61,7 @@ jobs:
           timeout: '30m0s'
           exit-code: '0'
 
-      - name: Upload Trivy scan results to GitHub Security tab for rstudio:latest
+      - name: Upload Trivy scan results to GitHub Security tab for rstudio
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-rstudio-latest.sarif"
@@ -69,10 +69,10 @@ jobs:
           category: trivy-rstudio
 
 
-      - name: Run Trivy vulnerability scanner on torchserve:latest
+      - name: Run Trivy vulnerability scanner on serve-torchserve:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/torchserve:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/serve-torchserve:latest"
           format: "sarif"
           output: "trivy-results-torchserve-latest.sarif"
           severity: "CRITICAL,HIGH"
@@ -80,7 +80,7 @@ jobs:
           timeout: '30m0s'
           exit-code: '0'
 
-      - name: Upload Trivy scan results to GitHub Security tab for torchserver:latest
+      - name: Upload Trivy scan results to GitHub Security tab for torchserver
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-torchserve-latest.sarif"
@@ -88,10 +88,10 @@ jobs:
           category: trivy-torchserver
 
 
-      - name: Run Trivy vulnerability scanner on mlflow-image:latest
+      - name: Run Trivy vulnerability scanner on serve-mlflow:latest
         uses: aquasecurity/trivy-action@0.7.1
         with:
-          image-ref: "ghcr.io/scilifelabdatacentre/mlflow-image:latest"
+          image-ref: "ghcr.io/scilifelabdatacentre/serve-mlflow:latest"
           format: "sarif"
           output: "trivy-results-mlflow-image-latest.sarif"
           severity: "CRITICAL,HIGH"
@@ -99,7 +99,7 @@ jobs:
           timeout: '30m0s'
           exit-code: '0'
 
-      - name: Upload Trivy scan results to GitHub Security tab for mlflow-image:latest
+      - name: Upload Trivy scan results to GitHub Security tab for mlflow
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: "trivy-results-mlflow-image-latest.sarif"
