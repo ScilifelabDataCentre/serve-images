@@ -1,11 +1,13 @@
 # TODO: change to latest
 FROM jupyter/minimal-notebook:latest
 
-COPY tests/notebooks/basic.ipynb tests/basic.ipynb
+COPY tests/notebooks/basic.ipynb /tests/basic.ipynb
 
 USER root
-RUN apt-get update && apt-get install curl -y
+RUN apt-get update && apt-get install curl -y --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 USER $NB_UID
-RUN pip install mlflow boto3 && \
-    pip install --force-reinstall "minio==7.0.2"
+RUN pip install --no-cache-dir mlflow boto3 && \
+    pip install --no-cache-dir --force-reinstall "minio==7.0.2"
