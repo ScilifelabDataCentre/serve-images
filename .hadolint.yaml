@@ -1,0 +1,6 @@
+failure-threshold: warning               # name of threshold level (error | warning | info | style | ignore | none)
+ignored:                                 # list of rules
+  # Always tag the version of an image explicitly
+  - DL3006
+  # Using latest tag. OK here because we are testing latest versions.
+  - DL3007
