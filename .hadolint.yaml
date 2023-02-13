@@ -1,0 +1,8 @@
+failure-threshold: warning               # name of threshold level (error | warning | info | style | ignore | none)
+ignored:                                 # list of rules
+  # Always tag the version of an image explicitly
+  - DL3006
+  # Using latest tag. OK here because we are testing the latest versions and only using if pass all tests.
+  - DL3007
+  # Pin versions in apt get install. OK here because we are testing the latest versions and only using if pass all tests.
+  - DL3008
