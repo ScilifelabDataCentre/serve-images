@@ -1,21 +1,17 @@
 FROM ubuntu:latest
 
-RUN apt update
-RUN apt install software-properties-common -y
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt update
-RUN apt install curl -y
+RUN apt-get update && apt-get install curl software-properties-common -y --no-install-recommends \
+    && apt-get install python3.8 python3-pip -y --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN apt install python3.8 -y
-RUN apt install python3-pip -y
+RUN apt-get install git git-lfs -y --no-install-recommends \
+    && pip3 install --no-cache-dir git+https://@github.com/scaleoutsystems/stackn@feature/STACKN-267#subdirectory=cli
 
-RUN apt install git -y
-RUN apt install git-lfs -y
-RUN pip3 install git+https://@github.com/scaleoutsystems/stackn@feature/STACKN-267#subdirectory=cli
-
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+RUN curl -fsSL https://code-server.dev/install.sh | /bin/bash
 
 RUN useradd -m stackn
 USER stackn
 
-CMD /usr/bin/code-server --auth=none --bind-addr=localhost:1234
+CMD ["/bin/bash", "-c", "/usr/bin/code-server --auth=none --bind-addr=localhost:1234"]
