@@ -1,8 +1,6 @@
 FROM pytorch/torchserve:latest
 
 ENV MODEL_STORE=models
-COPY tests/run_server.test.sh /home/model-server/run_server.sh
-
 USER root 
 
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -20,5 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 USER model-server
 
 RUN mkdir -p model-store/$MODEL_STORE
-COPY tests/models/* model-store/$MODEL_STORE/
-CMD /home/model-server/run_server.sh
+
+COPY tests/run_server.test.sh /run_server.sh
+COPY tests/models/* /model-store/$MODEL_STORE/
+CMD ["/home/model-server/run_server.sh"]

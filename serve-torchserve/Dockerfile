@@ -1,7 +1,6 @@
 FROM pytorch/torchserve:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
-COPY run_server.sh /home/model-server/run_server.sh
 USER root 
 
 RUN export DEBIAN_FRONTEND=noninteractive \
@@ -17,5 +16,6 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && chmod +x run_server.sh
 
 USER model-server
+COPY run_server.sh /home/model-server/run_server.sh
 
 ENTRYPOINT ["/home/model-server/run_server.sh"]
