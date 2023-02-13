@@ -1,9 +1,13 @@
-# Serve-images
+[![Black Formatting](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/black.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/black.yml)
+[![Hadolint](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/hadolint.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/hadolint.yml)
 [![Serve-MLFlow workflow](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-mlflow.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-mlflow.yml)
 [![Serve-Tensorflow workflow](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-tensorflow.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-tensorflow.yml)
 [![Serve-JupyterLab workflow](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-jupyterlab.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-jupyterlab.yml)
 [![Serve-Torchserve workflow](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-torchserve.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-torchserve.yml)
 [![Serve-RStudio workflow](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-rstudio.yml/badge.svg)](https://github.com/ScilifelabDataCentre/serve-images/actions/workflows/serve-rstudio.yml)
+
+
+# Serve-images
 
 This repository handles all the images for [Serve](https://github.com/ScilifelabDataCentre/stackn). 
 The pipeline for an image goes as follows:
