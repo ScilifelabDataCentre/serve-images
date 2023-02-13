@@ -20,7 +20,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 USER model-server
 
 RUN mkdir -p model-store/$MODEL_STORE
-
-COPY tests/models/* /model-store/$MODEL_STORE/
+WORKDIR /home/model-server
+COPY tests/models/* model-store/$MODEL_STORE/
 CMD ["/home/model-server/run_server.sh"]
 

@@ -1,8 +1,10 @@
 FROM pytorch/torchserve:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/stackn-images
 
+ENV MODEL_STORE=models
 USER root 
-COPY run_server.sh /home/model-server/run_server.sh
+
+COPY tests/run_server.test.sh /home/model-server/run_server.sh
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
@@ -18,5 +20,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
 
 USER model-server
 
+RUN mkdir -p model-store/$MODEL_STORE
+WORKDIR /home/model-server
 
 ENTRYPOINT ["/home/model-server/run_server.sh"]
