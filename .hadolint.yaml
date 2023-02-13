@@ -6,3 +6,5 @@ ignored:                                 # list of rules
   - DL3007
   # Pin versions in apt get install. OK here because we are testing the latest versions and only using if pass all tests.
   - DL3008
+  # Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>
+  - DL3013

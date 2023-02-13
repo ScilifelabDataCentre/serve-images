@@ -48,7 +48,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get autoremove -yq && apt-get autoclean -yq
 
 # Create user and set permissions
-RUN useradd -M -s /bin/bash -N -u ${NB_UID} ${NB_USER} \
+RUN useradd -M -s /bin/bash -N -u ${NB_UID} -l ${NB_USER} \
    && mkdir -p ${HOME} \
    && chown -R ${NB_USER}:users ${HOME} \
    && mkdir ${HOME}/.gnupg \
