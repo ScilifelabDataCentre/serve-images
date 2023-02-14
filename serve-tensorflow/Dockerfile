@@ -17,7 +17,7 @@ COPY --from=builder /usr/local/bin/tensorflow_model_server /usr/bin/tensorflow_m
 EXPOSE 8500
 EXPOSE 8501
 
-ENV MODEL_BASE_PATH=$HOME/models
+ENV MODEL_BASE_PATH=/models
 ENV MODEL_NAME=model
 
 RUN useradd -m $USER \
