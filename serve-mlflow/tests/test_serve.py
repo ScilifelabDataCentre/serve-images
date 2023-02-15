@@ -20,14 +20,13 @@ MODEL_NAME = "test_model"
 client = docker.from_env()
 container = client.containers.run(
     image=os.environ["IMAGE_NAME"],
-    command='/bin/bash -c "python3 mlrun_example.py {} {}  && mlflow models serve -m {} --host {} --port {} --env-manager local"'.format(
+    command='/bin/bash -c "python3 mlrun_example.py {} {}  && mlflow models serve -m {} --host {} --port {}"'.format(
         EXPERIMENT_NAME, MODEL_NAME, MODELPATH, HOST, PORT
     ),
     ports={f"{PORT}/tcp": PORT},
     detach=True,
 )
-
-time.sleep(10)
+time.sleep(10)  # Update this somehow.
 container.reload()
 
 
@@ -44,13 +43,30 @@ def test_container_ports():
 
 def test_mlflow_access():
     """Test of basic communication with the container returns status 200 (OK)."""
-    try:
-        url = _get_url(container)
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        if response.status_code == 200:
-            assert True
-    except ConnectionError:
-        assert False
+    url = _get_url(container) + "/ping"
+    # check the API endpoint every 10 seconds
+    max_attempts = 50
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(url, timeout=TIMEOUT_CALL)
+            if response.status_code == 200:
+                print("mlflow server is up and running!")
+                assert True
+                break
+        except:
+            pass
+
+        if attempt == max_attempts:
+            RuntimeError(
+                f"mlflow server did not become ready after {max_attempts} attempts"
+            )
+            assert False
+
+        print(
+            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
+        )
+        time.sleep(10)
 
 
 def test_prediction():
