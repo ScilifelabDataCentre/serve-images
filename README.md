@@ -23,7 +23,7 @@ So for instance, our torchserve image is build like this
 3. Run tests
 4. Push to GHCR
 
-We use Trivy for security scans and black for python formatting.
+We use Trivy for security scans, black for python formatting and hadolint for linting of dockerfiles.
 
 ## Trunk based workflow
 In this repo, we work [Trunk based](https://www.toptal.com/software/trunk-based-development-git-flow), which means that we bypass the dev branch.
