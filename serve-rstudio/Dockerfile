@@ -73,11 +73,14 @@ COPY --from=base --chown=${NB_USER}:users /etc/rstudio/ /etc/rstudio/
 COPY --from=base --chown=${NB_USER}:users /var/run/rstudio-server/ /var/run/rstudio-server/
 COPY --from=base --chown=${NB_USER}:users /usr/lib/rstudio-server/ /usr/lib/rstudio-server/
 COPY --from=base --chown=${NB_USER}:users /var/lib/rstudio-server/ /var/lib/rstudio-server/
-COPY run.sh ./run.sh
 
-RUN chmod +x ./run.sh
+WORKDIR $HOME
+
+COPY run.sh /etc/run.sh
+
+RUN chmod +x /etc/run.sh
 
 USER ${NB_UID}
 EXPOSE 8787
 
-ENTRYPOINT ["./run.sh"]
+ENTRYPOINT ["/etc/run.sh"]
