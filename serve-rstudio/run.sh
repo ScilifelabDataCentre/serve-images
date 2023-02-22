@@ -1,8 +1,8 @@
-#!/usr/bin/with-contenv bash
+#!/bin/bash
 # using rstudio with non-root and `--auth-none=1` inexplicably requires USER to be set
 export USER=${NB_USER}
-
-exec /usr/lib/rstudio-server/bin/rserver \
+echo "Starting server..."
+/usr/lib/rstudio-server/bin/rserver \
   --server-daemonize=0 \
   --server-working-dir=${HOME} \
   --server-user=${NB_USER} \
