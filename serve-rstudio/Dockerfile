@@ -30,9 +30,12 @@ RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudi
 FROM ubuntu:20.04 as build
 
 # Common environment variables
-ENV NB_USER jovyan
-ENV NB_UID 1000
-ENV HOME /home/$NB_USER
+ENV USER jovyan
+ENV GROUP users
+ENV PASSWORD default
+ENV DISABLE_AUTH 1
+ENV UID 1000
+ENV HOME /home/$USER
 
 # Set locale configs
 ENV LANG en_US.UTF-8
@@ -49,16 +52,23 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       sudo \
       lsb-release \
       libclang-dev \
+      libxml2 \ 
+      libodbc1 \
+      libglpk-dev \
       r-base \
+      r-base-dev \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get -yq update \ 
-    && apt-get autoremove -yq && apt-get autoclean -yq \
-    && useradd -M -s /bin/bash -N -u ${NB_UID} -l ${NB_USER} \
+    && apt-get autoremove -yq && apt-get autoclean -yq
+
+
+RUN useradd -s /bin/bash -N -u ${UID} -l ${USER} \
     && mkdir -p ${HOME} \
-    && chown -R ${NB_USER}:users ${HOME} \
-    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
-    && locale-gen
+    && chown -R ${USER}:${GROUP} ${HOME} \
+    && echo "${USER}:password123" | chpasswd
 
 ENV R_HOME usr/lib/R
 
@@ -69,18 +79,19 @@ RUN echo "TZ=Etc/UTC" >> ${R_HOME}/etc/Renviron.site
 RUN echo 'options(repos=c(CRAN="https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' >>  ${R_HOME}/etc/Rprofile.site \
  && echo 'options(HTTPUserAgent=sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ${R_HOME}/etc/Rprofile.site
 
-COPY --from=base --chown=${NB_USER}:users /etc/rstudio/ /etc/rstudio/
-COPY --from=base --chown=${NB_USER}:users /var/run/rstudio-server/ /var/run/rstudio-server/
-COPY --from=base --chown=${NB_USER}:users /usr/lib/rstudio-server/ /usr/lib/rstudio-server/
-COPY --from=base --chown=${NB_USER}:users /var/lib/rstudio-server/ /var/lib/rstudio-server/
+COPY --from=base --chown=${USER}:${GROUP} /etc/rstudio/ /etc/rstudio/
+COPY --from=base --chown=${USER}:${GROUP} /var/run/rstudio-server/ /var/run/rstudio-server/
+COPY --from=base --chown=${USER}:${GROUP} /usr/lib/rstudio-server/ /usr/lib/rstudio-server/
+COPY --from=base --chown=${USER}:${GROUP} /var/lib/rstudio-server/ /var/lib/rstudio-server/
 
 WORKDIR $HOME
 
 COPY run.sh /etc/run.sh
 
-RUN chmod +x /etc/run.sh
+RUN chown ${USER}:${GROUP} /etc/run.sh \
+    && chmod +x /etc/run.sh
 
-USER ${NB_UID}
+USER ${USER}
 EXPOSE 8787
 
 ENTRYPOINT ["/etc/run.sh"]
