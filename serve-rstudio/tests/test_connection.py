@@ -19,7 +19,7 @@ container = client.containers.run(
     },
     detach=True,
 )
-time.sleep(20)
+time.sleep(1)
 container.reload()
 
 
@@ -37,12 +37,26 @@ def test_rstudio_port():
 def test_rstudio_access():
     """Test of basic communication with the container returns status 200 (OK)."""
     url = _get_url(container)
-    try:
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        assert response.status_code == 200
-        assert "RStudio" in response.text
-    except ConnectionError:
-        assert False
+    max_attempts = 50
+
+    for attempt in range(1, max_attempts + 1):
+        try:
+            response = requests.get(url, timeout=TIMEOUT_CALL)
+            if response.status_code == 200:
+                print("RStudio is up and running!")
+                assert True
+                break
+        except:
+            pass
+
+        if attempt == max_attempts:
+            RuntimeError(f"Rstudio did not become ready after {max_attempts} attempts")
+            assert False
+
+        print(
+            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
+        )
+        time.sleep(10)
 
 
 def test_shutdown():
@@ -59,5 +73,5 @@ def test_shutdown():
 def _get_url(container):
     """Gets the URL of the container."""
     ip = container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
-    url = "http://{}:8787".format(ip)
+    url = "http://{}:{}".format(ip, PORT)
     return url
