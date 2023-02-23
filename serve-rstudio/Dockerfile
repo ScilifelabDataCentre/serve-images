@@ -29,6 +29,8 @@ RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudi
 
 FROM ubuntu:20.04 as build
 
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
 # Common environment variables
 ENV USER jovyan
 ENV GROUP users
