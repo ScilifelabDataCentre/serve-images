@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o errexit
+
 docker build -t mlflow-dev-img -f ./serve-mlflow/Dockerfile.test ./serve-mlflow
 python3 -m venv venv
 source ./venv/bin/activate

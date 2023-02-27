@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o errexit
+
 docker build -t rstudio-dev-img ./serve-rstudio
 python3 -m venv venv
 source ./venv/bin/activate
