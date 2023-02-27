@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o errexit
+
 docker build -t serve-tensorflow-dev-img -f ./serve-tensorflow/Dockerfile.test ./serve-tensorflow
 python3 -m venv venv
 source ./venv/bin/activate

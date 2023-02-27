@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -o errexit
+
 docker build -t jupyterlab-dev-img -f ./serve-jupyterlab/Dockerfile.test ./serve-jupyterlab
 python3 -m venv venv
 source ./venv/bin/activate
