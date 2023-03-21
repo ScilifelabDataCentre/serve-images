@@ -9,7 +9,7 @@ on:
         default: 'serve-jupyterlab'
         type: choice
         options:
-        - serve-juputerlab
+        - serve-jupyterlab
       logLevel:
         description: 'Log level'
         required: true
