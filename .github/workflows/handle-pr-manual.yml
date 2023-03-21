@@ -35,8 +35,10 @@ jobs:
       - name: The selected serve image
         run: echo selected serve image is ${{ github.event.inputs.serveImageName }}
 
-      - name: Checkout GitHub Action
-        uses: actions/checkout@pr-dev
+      - name: Checkout branch pr-dev
+        uses: actions/checkout@main
+        with:
+          ref: 'pr-dev'
 
       - name: Build test image
         run: |
