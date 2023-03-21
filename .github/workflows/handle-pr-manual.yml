@@ -1,0 +1,37 @@
+name: Handle PR
+
+on:
+  workflow_dispatch:
+    inputs:
+      serveImageName:
+        description: 'The serve image to build and publish'
+        required: true
+        default: 'juputer-lab'
+        type: choice
+        options:
+        - juputer-lab
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Manual run'
+        required: false
+        type: boolean
+ 
+ jobs:
+
+  build:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Branch or tag that triggered the workflow run
+        run: echo running on branch ${GITHUB_REF##*/}
+
+      - name: The selected serve image
+        run: echo selected serve image is ${serveImageName}
