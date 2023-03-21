@@ -33,4 +33,4 @@ jobs:
         run: echo running on branch ${GITHUB_REF##*/}
 
       - name: The selected serve image
-        run: echo selected serve image is ${serveImageName}
+        run: echo selected serve image is ${{ github.event.inputs.serveImageName }}
