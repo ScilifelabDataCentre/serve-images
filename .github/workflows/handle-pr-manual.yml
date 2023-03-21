@@ -24,8 +24,7 @@ on:
         required: false
         type: boolean
  
- jobs:
-
+jobs:
   build:
     runs-on: ubuntu-20.04
 
