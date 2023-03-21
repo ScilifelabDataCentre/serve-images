@@ -6,10 +6,10 @@ on:
       serveImageName:
         description: 'The serve image to build and publish'
         required: true
-        default: 'juputer-lab'
+        default: 'serve-jupyterlab'
         type: choice
         options:
-        - juputer-lab
+        - serve-juputerlab
       logLevel:
         description: 'Log level'
         required: true
@@ -25,7 +25,7 @@ on:
         type: boolean
  
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-20.04
 
     steps:
@@ -34,3 +34,26 @@ jobs:
 
       - name: The selected serve image
         run: echo selected serve image is ${{ github.event.inputs.serveImageName }}
+
+      - name: Checkout GitHub Action
+        uses: actions/checkout@pr-dev
+
+      - name: Build test image
+        run: |
+            docker build -t test-image -f ./${{ github.event.inputs.serveImageName }}/Dockerfile.test ./${{ github.event.inputs.serveImageName }}
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.7.1
+        with:
+          image-ref: 'test-image'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          security-checks: 'vuln'
+          timeout: '30m0s'
+          exit-code: '1'
+
+      - name: Run tests
+        env:
+          IMAGE_NAME: test-image
+        run: | 
+          pip install -r ./${{ github.event.inputs.serveImageName }}/tests/requirements.txt
+          python3 -m pytest ./${{ github.event.inputs.serveImageName }}
