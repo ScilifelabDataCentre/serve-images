@@ -106,8 +106,8 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./{{$SERVE_IMAGE}}/Dockerfile
-          context: ./{{$SERVE_IMAGE}}
+          file: ./$SERVE_IMAGE/Dockerfile
+          context: ./$SERVE_IMAGE
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
