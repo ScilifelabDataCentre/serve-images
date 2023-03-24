@@ -92,7 +92,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/{{$SERVE_IMAGE}}
+          images: ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}
           tags: |
             type=raw,value=pr-dev-{{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
