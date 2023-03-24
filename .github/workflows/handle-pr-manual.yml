@@ -112,4 +112,4 @@ jobs:
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/{{$SERVE_IMAGE}}:pr-dev
+            ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}:pr-dev
