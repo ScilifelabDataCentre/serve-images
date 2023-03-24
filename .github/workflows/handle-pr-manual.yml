@@ -1,6 +1,6 @@
 # Manual handling of forked PR:s.
-# Note that this workflow should be triggered manually.
-# -----------------------------------------------------
+# Note that this workflow is triggered manually, on purpose.
+# ----------------------------------------------------------
 name: Handle PR
 
 on:
@@ -13,6 +13,10 @@ on:
         type: choice
         options:
         - serve-jupyterlab
+        - serve-mlflow
+        - serve-rstudio
+        - serve-tensorflow
+        - serve-torchserve
       logLevel:
         description: 'Log level'
         required: true
@@ -26,7 +30,10 @@ on:
         description: 'Manual run'
         required: false
         type: boolean
- 
+
+env:
+  SERVE_IMAGE: ${{ github.event.inputs.serveImageName }}
+
 jobs:
   build-and-test:
     runs-on: ubuntu-20.04
@@ -36,7 +43,7 @@ jobs:
         run: echo running on branch ${GITHUB_REF##*/}
 
       - name: The selected serve image
-        run: echo selected serve image is ${{ github.event.inputs.serveImageName }}
+        run: echo selected serve image is $SERVE_IMAGE
 
       - name: Checkout branch pr-dev
         uses: actions/checkout@main
@@ -45,7 +52,7 @@ jobs:
 
       - name: Build test image
         run: |
-            docker build -t test-image -f ./${{ github.event.inputs.serveImageName }}/Dockerfile.test ./${{ github.event.inputs.serveImageName }}
+            docker build -t test-image -f ./$SERVE_IMAGE/Dockerfile.test ./$SERVE_IMAGE
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
         with:
@@ -60,8 +67,8 @@ jobs:
         env:
           IMAGE_NAME: test-image
         run: | 
-          pip install -r ./${{ github.event.inputs.serveImageName }}/tests/requirements.txt
-          python3 -m pytest ./${{ github.event.inputs.serveImageName }}
+          pip install -r ./$SERVE_IMAGE/tests/requirements.txt
+          python3 -m pytest ./$SERVE_IMAGE
 
   push: 
     if: | 
@@ -85,7 +92,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}
+          images: ghcr.io/scilifelabdatacentre/$SERVE_IMAGE
           tags: |
             type=raw,value=pr-dev-{{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -99,10 +106,10 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./${{ github.event.inputs.serveImageName }}/Dockerfile
-          context: ./${{ github.event.inputs.serveImageName }}
+          file: ./$SERVE_IMAGE/Dockerfile
+          context: ./$SERVE_IMAGE
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}:pr-dev
+            ghcr.io/scilifelabdatacentre/$SERVE_IMAGE:pr-dev
