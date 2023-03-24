@@ -1,3 +1,6 @@
+# Manual handling of forked PR:s.
+# Note that this workflow should be triggered manually.
+# -----------------------------------------------------
 name: Handle PR
 
 on:
@@ -78,6 +81,14 @@ jobs:
         with:
           ref: 'pr-dev'
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}
+          tags: |
+            type=raw,value=pr-dev-{{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
+
       - name: Login to GHCR
         uses: docker/login-action@v1
         with:
@@ -93,4 +104,5 @@ jobs:
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
+            ${{ steps.meta.outputs.tags }}
             ghcr.io/scilifelabdatacentre/${{ github.event.inputs.serveImageName }}:pr-dev
