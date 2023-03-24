@@ -92,7 +92,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/scilifelabdatacentre/$SERVE_IMAGE
+          images: ghcr.io/scilifelabdatacentre/{{$SERVE_IMAGE}}
           tags: |
             type=raw,value=pr-dev-{{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
 
@@ -106,10 +106,10 @@ jobs:
       - name: Publish image to GHCR
         uses: docker/build-push-action@v3
         with:
-          file: ./$SERVE_IMAGE/Dockerfile
-          context: ./$SERVE_IMAGE
+          file: ./{{$SERVE_IMAGE}}/Dockerfile
+          context: ./{{$SERVE_IMAGE}}
           push: true
           build-args: version=${{ github.ref_name }}
           tags: |
             ${{ steps.meta.outputs.tags }}
-            ghcr.io/scilifelabdatacentre/$SERVE_IMAGE:pr-dev
+            ghcr.io/scilifelabdatacentre/{{$SERVE_IMAGE}}:pr-dev
