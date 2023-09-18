@@ -27,7 +27,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
       libodbc1 \
       libglpk-dev \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
-    && locale-gen
+    && locale-gen \
+    && rm -rf /var/lib/apt/lists/*
 
 # INSTALL R
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9 \
