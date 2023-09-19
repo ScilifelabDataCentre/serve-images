@@ -17,9 +17,11 @@ RUN git clone -b $SERVE_BRANCH https://github.com/ScilifelabDataCentre/stackn /t
     && chown -R jovyan /home/jovyan/work/examples \
     && chgrp -R $NB_GID /home/jovyan/work/examples
 
-RUN npm install npm@latest -g \
+RUN npm remove package-lock.json \
+    && npm install npm@latest -g \
     && npm cache clean --force \
     && npm -v
+
 
 USER $NB_UID
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
