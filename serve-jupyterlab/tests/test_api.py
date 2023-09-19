@@ -14,7 +14,7 @@ import docker
 
 # Settings
 PORT = 8888  # the jupyter-lab port
-HOST = "localhost:8888"  # the host
+HOST = f"localhost:{PORT}"  # the host
 NOTEBOOK_PATH = "tests/basic.ipynb"  # the relative path to the jupyter test notebook
 TOKEN = "a268cff61a101aaefe53b02b5a787ddfc0e07d4119154bff"  # the token to use
 TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
