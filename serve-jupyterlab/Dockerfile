@@ -1,25 +1,25 @@
 FROM jupyter/minimal-notebook:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/serve-images
 
-ARG STACKN_BRANCH=release/v0.7.0
-ARG CLI_BRANCH=develop
+ARG SERVE_BRANCH=develop
+WORKDIR /home/jovyan
+
+COPY requirements.txt /tmp
 
 USER root
 RUN apt-get update && apt-get install curl -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-COPY requirements.txt /tmp
-RUN git clone -b $STACKN_BRANCH https://github.com/scaleoutsystems/stackn.git /tmp/stackn \
-    && mv /tmp/stackn/examples /home/jovyan/work \
-    && rm -rf /tmp/stackn \
-    && mkdir -p /home/jovyan/.scaleout \
-    && chown -R jovyan /home/jovyan/work/examples /home/jovyan/.scaleout \
-    && chgrp -R $NB_GID /home/jovyan/work/examples /home/jovyan/.scaleout
+
+RUN git clone -b $SERVE_BRANCH https://github.com/ScilifelabDataCentre/stackn /tmp/serve \
+    && mv /tmp/serve/examples /home/jovyan/work \
+    && rm -rf /tmp/serve \
+    && chown -R jovyan /home/jovyan/work/examples \
+    && chgrp -R $NB_GID /home/jovyan/work/examples
 
 RUN npm install npm@latest -g \
     && npm cache clean --force \
     && npm -v
 
 USER $NB_UID
-RUN pip install --no-cache-dir -r /tmp/requirements.txt  \
-    && pip install --no-cache-dir git+https://github.com/scaleoutsystems/studio-cli.git@$CLI_BRANCH
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
