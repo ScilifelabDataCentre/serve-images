@@ -17,7 +17,7 @@ RUN git clone -b $SERVE_BRANCH https://github.com/ScilifelabDataCentre/stackn /t
     && chown -R jovyan /home/jovyan/work/examples \
     && chgrp -R $NB_GID /home/jovyan/work/examples
 
-RUN npm remove package-lock.json \
+RUN npm cache clean --force \
     && npm install npm@9.8.1 -g \
     && npm cache clean --force \
     && npm -v
