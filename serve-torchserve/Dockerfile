@@ -4,7 +4,7 @@ LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/st
 ENV MODEL_STORE=models
 USER root 
 
-COPY tests/run_server.test.sh /home/model-server/run_server.sh
+COPY tests/run_server.sh /home/model-server/run_server.sh
 
 RUN export DEBIAN_FRONTEND=noninteractive \
     && apt-get -yq update \
