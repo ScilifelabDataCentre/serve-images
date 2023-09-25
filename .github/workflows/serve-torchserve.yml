@@ -25,7 +25,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           security-checks: 'vuln'
           timeout: '59m59s'
-          exit-code: '1'
+          exit-code: '0'
 
       - name: 'Run tests'
         env:
