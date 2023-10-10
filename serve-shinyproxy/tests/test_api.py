@@ -8,7 +8,7 @@ TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 
 client = docker.from_env()
 container = client.containers.run(
-    image=os.environ["IMAGE_NAME"],
+    image="shinyproxy-dev-img",
     ports={f"{PORT}/tcp": PORT},
     detach=True,
 )
@@ -26,12 +26,13 @@ def test_container_ports():
     assert len(container.ports) == 1, "There should be 1 port"
     assert container.ports[f"{PORT}/tcp"][0]["HostPort"] == str(PORT)
 
-def test_proxyspec():
-    url = _get_url(container)+"/api/proxyspec"
-    max_attempts = 100
+def test_login():
+    url = _get_url(container)+"/login"
+    max_attempts = 50
 
     for attempt in range(1, max_attempts + 1):
         try:
+            print("URL is: ",url)
             response = requests.get(url, timeout=TIMEOUT_CALL)
             if response.status_code == 200:
                 print("Shinyproxy is up and running!")
