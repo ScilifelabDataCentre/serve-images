@@ -8,7 +8,7 @@ TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 
 client = docker.from_env()
 container = client.containers.run(
-    image=["IMAGE_NAME"],
+    image=os.environ["IMAGE_NAME"],
     ports={f"{PORT}/tcp": PORT},
     detach=True,
 )
@@ -26,13 +26,14 @@ def test_container_ports():
     assert len(container.ports) == 1, "There should be 1 port"
     assert container.ports[f"{PORT}/tcp"][0]["HostPort"] == str(PORT)
 
+
 def test_login():
-    url = _get_url(container)+"/login"
+    url = _get_url(container) + "/login"
     max_attempts = 50
 
     for attempt in range(1, max_attempts + 1):
         try:
-            print("URL is: ",url)
+            print("URL is: ", url)
             response = requests.get(url, timeout=TIMEOUT_CALL)
             if response.status_code == 200:
                 print("Shinyproxy is up and running!")
@@ -42,13 +43,16 @@ def test_login():
             pass
 
         if attempt == max_attempts:
-            RuntimeError(f"Shinyproxy did not become ready after {max_attempts} attempts")
+            RuntimeError(
+                f"Shinyproxy did not become ready after {max_attempts} attempts"
+            )
             assert False
 
         print(
             f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
         )
         time.sleep(10)
+
 
 def _get_url(container):
     """Gets the URL of the container."""
