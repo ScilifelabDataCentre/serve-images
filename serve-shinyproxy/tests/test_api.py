@@ -8,7 +8,7 @@ TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
 
 client = docker.from_env()
 container = client.containers.run(
-    image="shinyproxy-dev-img",
+    image=["IMAGE_NAME"],
     ports={f"{PORT}/tcp": PORT},
     detach=True,
 )
