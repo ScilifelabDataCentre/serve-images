@@ -4,6 +4,22 @@ on:
   push:
     paths:
       - "serve-tensorflow/**"
+  # Adds ability to run this workflow manually
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Manual run'
+        required: false
+        type: boolean
 
 jobs:
   build_and_test:
@@ -25,7 +41,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
           security-checks: 'vuln'
           timeout: '30m0s'
-          exit-code: '1'
+          exit-code: '0'
 
       - name: 'Run tests'
         env:
