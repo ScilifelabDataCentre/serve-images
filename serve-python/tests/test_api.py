@@ -41,13 +41,14 @@ def test_container_ports():
 
 def test_container_access():
     """Test of basic communication with the container returns status 200 (OK)."""
-    max_attempts = 100
+    max_attempts = 20
     for attempt in range(1, max_attempts + 1):
         try:
             url = _get_api_url(container) + "/health"
             response = requests.get(url, timeout=TIMEOUT_CALL)
             if response.status_code == 200:
                 assert True
+                break
         except:
             pass
         if attempt == max_attempts:
@@ -64,7 +65,7 @@ def test_container_access():
 
 def test_prediction():
     """Verify that the model can be used for predictions."""
-    max_attempts = 100
+    max_attempts = 20
     for attempt in range(1, max_attempts + 1):
         # Set input string
         example = "Jag är ett barn, och det här är mitt hem. Alltså är det ett barnhem!"
@@ -79,6 +80,7 @@ def test_prediction():
             assert json.loads(text_decoded) == {
                 "result": ["barn", "hem", "hus", "spädbarn", "##hem"]
             }
+            break
         if attempt == max_attempts:
             RuntimeError(
                 f"Python Deployment did not become ready after {max_attempts} attempts"
