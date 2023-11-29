@@ -41,29 +41,54 @@ def test_container_ports():
 
 def test_container_access():
     """Test of basic communication with the container returns status 200 (OK)."""
-    try:
-        url = _get_api_url(container) + "/health"
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        if response.status_code == 200:
-            assert True
-    except ConnectionError:
-        assert False
+    max_attempts = 100
+    for attempt in range(1, max_attempts + 1):
+        try:
+            url = _get_api_url(container) + "/health"
+            response = requests.get(url, timeout=TIMEOUT_CALL)
+            if response.status_code == 200:
+                assert True
+        except:
+            pass
+        if attempt == max_attempts:
+            RuntimeError(
+                f"Python Deployment did not become ready after {max_attempts} attempts"
+            )
+            assert False
+
+        print(
+            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
+        )
+        time.sleep(10)
 
 
 def test_prediction():
     """Verify that the model can be used for predictions."""
-    # Set input string
-    example = "Jag är ett barn, och det här är mitt hem. Alltså är det ett barnhem!"
-    # msk_ind takes an index in order to mask (or hide) one of the word in the example sentence, which should then be predicted by the BERT trained model
-    msk_ind = 4
-    url = _get_api_url(container) + "/predict/"
-    res = requests.post(url, json={"pred": example, "msk_ind": msk_ind})
-    text_encoded = res.json().encode("latin1")
-    text_decoded = text_encoded.decode("unicode-escape")
-    print(json.loads(text_decoded))
-    assert json.loads(text_decoded) == {
-        "result": ["barn", "hem", "hus", "spädbarn", "##hem"]
-    }
+    max_attempts = 100
+    for attempt in range(1, max_attempts + 1):
+        # Set input string
+        example = "Jag är ett barn, och det här är mitt hem. Alltså är det ett barnhem!"
+        # msk_ind takes an index in order to mask (or hide) one of the word in the example sentence, which should then be predicted by the BERT trained model
+        msk_ind = 4
+        url = _get_api_url(container) + "/predict/"
+        res = requests.post(url, json={"pred": example, "msk_ind": msk_ind})
+        text_encoded = res.json().encode("latin1")
+        text_decoded = text_encoded.decode("unicode-escape")
+        print(json.loads(text_decoded))
+        if res.status_code == 200:
+            assert json.loads(text_decoded) == {
+                "result": ["barn", "hem", "hus", "spädbarn", "##hem"]
+            }
+        if attempt == max_attempts:
+            RuntimeError(
+                f"Python Deployment did not become ready after {max_attempts} attempts"
+            )
+            assert False
+
+        print(
+            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
+        )
+        time.sleep(10)
 
 
 def test_shutdown():
