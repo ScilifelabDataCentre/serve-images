@@ -84,11 +84,5 @@ def _get_ip(container):
 
 def _get_api_url(container):
     """Gets the correct adress for inference."""
-    url = "http://{}:{}".format(_get_ip(container), PORTS[1])
-    return url
-
-
-def _get_gRPC_url(container):
-    """Gets the correct adress for torchserve management."""
-    url = "http://{}:{}}".format(_get_ip(container), PORTS[0])
+    url = "http://{}:{}".format(_get_ip(container), PORTS[0])
     return url
