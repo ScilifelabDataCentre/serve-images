@@ -24,58 +24,6 @@ from starlette.responses import Response
 
 from src.models import predict
 
-REQUEST_TIME = Histogram(
-    "serve_predict_duration_seconds",
-    "Prediction duration in seconds",
-    ("method", "status_code", "path"),
-)
-
-
-REQUEST_COUNT = Counter(
-    "serve_predict_total",
-    "Total number of predict calls",
-    ("method", "status_code", "path"),
-)
-
-
-class PromMiddleware(BaseHTTPMiddleware):
-    def __init__(self, app: ASGIApp):
-        super().__init__(app)
-
-    async def dispatch(self, request, call_next):
-        method = request.method
-        path = request.url.path
-        timer_begin = time.time()
-
-        status_code = 500
-
-        try:
-            response = await call_next(request)
-            status_code = response.status_code
-        except:
-            raise Exception("Call failed.")
-
-        timer_end = time.time()
-
-        labels = [method, status_code, path]
-
-        REQUEST_COUNT.labels(*labels).inc()
-        REQUEST_TIME.labels(*labels).observe(timer_end - timer_begin)
-        return response
-
-
-def metrics(request):
-    registry = REGISTRY
-    if "prometheus_multiproc_dir" in os.environ:
-        registry = CollectorRegistry()
-        multiprocess.MultiProcessCollector(registry)
-
-    data = generate_latest(registry)
-    response_headers = {"Content-Type": CONTENT_TYPE_LATEST}
-
-    return Response(data, status_code=200, headers=response_headers)
-
-
 try:
     from src.models import input_type
 
@@ -102,8 +50,6 @@ if hasattr(predict, "model_load"):
     print("Done.")
 
 app = FastAPI()
-app.add_middleware(PromMiddleware)
-app.add_route("/metrics/", metrics)
 
 
 @app.post("/predict/")
@@ -114,3 +60,19 @@ async def predict_route(
     print(pred_request)
     res = predict.model_predict(pred_request, model_data)
     return json.dumps(res)
+
+
+@app.get(
+    "/health",
+    tags=["healthcheck"],
+    summary="Perform a Health Check",
+    response_description="Return HTTP Status Code 200 (OK)",
+)
+def get_health():
+    """
+    ## Perform a Health Check
+    Endpoint to perform a healthcheck on.
+    Returns:
+        HealthCheck: Returns a JSON response with the health status
+    """
+    return {"status": "OK"}

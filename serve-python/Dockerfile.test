@@ -27,15 +27,19 @@ RUN apt-get update \
 # RUN /bin/bash -c "apt update"
 # RUN /bin/bash -c "curl https://dl.min.io/client/mc/release/linux-amd64/mc --output mc && chmod +x mc"
 COPY requirements.txt $HOME/requirements.txt
-RUN /bin/bash -c "pip3 install -r requirements.txt --no-cache-dir"
+RUN /bin/bash -c "pip3 install -r requirements.txt"
 
 COPY serve.py $HOME/serve.py
 COPY deploy.sh $HOME/deploy.sh
 COPY deploy.sh $HOME/start-script.sh
+COPY tests/model/ $HOME/models/
 RUN chmod +x start-script.sh \
     && chmod +x deploy.sh \
     && chown -R $USER:$USER $HOME
 
+WORKDIR $HOME/models
+RUN pip3 install -r requirements.txt --no-cache-dir
+WORKDIR $HOME
 ENV STACKN_MODEL_PATH=$HOME/models
 ENV PYTHONPATH=$HOME/models
 
