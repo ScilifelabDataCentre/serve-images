@@ -1,0 +1,14 @@
+:root{
+    --serve-lime: #a7c947;
+    --bs-body-color-rgb: rgb(33, 37, 41);
+}
+
+.button {
+    background: var(--serve-lime);
+    color: black
+}
+
+.button:hover {
+    background-color: var(--serve-lime);
+    box-shadow: 0 0.5rem 1rem rgba(var(--bs-body-color-rgb), .15) !important;
+}
