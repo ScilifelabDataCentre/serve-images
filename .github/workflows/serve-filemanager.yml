@@ -1,4 +1,4 @@
-name: Streamlit example workflow
+name: File Manager workflow
 
 on:
   push:
