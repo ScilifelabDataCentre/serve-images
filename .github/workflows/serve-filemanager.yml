@@ -56,8 +56,8 @@ jobs:
     - name: Publish image to GHCR
       uses: docker/build-push-action@v3
       with:
-        file: ./examples/streamlit/Dockerfile
-        context: ./examples/streamlit
+        file: ./serve-filemanager/Dockerfile
+        context: ./serve-filemanager
         push: true
         build-args: version=${{ github.ref_name }}
         tags: |
