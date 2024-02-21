@@ -6,7 +6,10 @@ ARG HOME=/home/$USER
 COPY filebrowser.json /.filebrowser.json
 
 COPY startup.sh /usr/local/bin/startup.sh
-RUN apk update \
+RUN apk add --update --no-cache \
+    wget \
+    zip \
+    unzip \
     && adduser -D -u 1000 -g 1000 -h $HOME $USER \
     && chmod +x /usr/local/bin/startup.sh \
     && rm -rf /var/lib/apt/lists/*
