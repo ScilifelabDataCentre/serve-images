@@ -2,7 +2,7 @@
 FROM debian:stable-slim
 
 # Install PostgreSQL client and GPG
-RUN apt-get update && apt-get install -y gnupg2 curl postgresql-client && apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --no-install-recommends -y gnupg2 curl postgresql-client && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user and group (using user ID 1000 and group ID 1000 for compatibility)
 # Fixed commands for Debian
