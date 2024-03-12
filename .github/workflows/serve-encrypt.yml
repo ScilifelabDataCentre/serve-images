@@ -1,0 +1,68 @@
+name: Serve-Encrypt workflow
+
+on:
+  push:
+    paths:
+      - "serve-encrypt/**"
+  # Adds ability to run this workflow manually
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+        type: choice
+        options:
+        - info
+        - warning
+        - debug
+      tags:
+        description: 'Manual run'
+        required: false
+        type: boolean
+        
+jobs:
+
+  push: 
+    if: | 
+      github.ref == 'refs/heads/main' &&
+      github.repository == 'scilifelabdatacentre/serve-images'
+
+    runs-on: ubuntu-latest
+    concurrency:
+      group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+      cancel-in-progress: true
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      - name: 'Checkout github action'
+        uses: actions/checkout@main
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ghcr.io/scilifelabdatacentre/serve-encrypt
+          tags: |
+            type=raw,value={{date 'YYMMDD-HHmm' tz='Europe/Stockholm'}}
+
+      - name: 'Login to GHCR'
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{github.actor}}
+          password: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Publish image to GHCR
+        uses: docker/build-push-action@v3
+        with:
+          file: ./serve-encrypt/Dockerfile
+          context: ./serve-encrypt
+          push: true
+          build-args: version=${{ github.ref_name }}
+          tags: |
+            ${{ steps.meta.outputs.tags }}
+            ghcr.io/scilifelabdatacentre/serve-encrypt:latest
+          labels: ${{ steps.meta.outputs.labels }}

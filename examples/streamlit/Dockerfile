@@ -11,7 +11,10 @@ WORKDIR $HOME/app
 RUN apt-get update && apt-get install --no-install-recommends -y \
     build-essential \
     software-properties-common \ 
-    curl
+    curl \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 
 COPY requirements.txt requirements.txt
 COPY app.py app.py
