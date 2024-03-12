@@ -8,7 +8,7 @@ ENV GNUPGHOME=/home/pguser/.gnupg
 # Create a non-root user and group (using user ID 1000 and group ID 1000 for compatibility)
 # Fixed commands for Debian
 RUN apt-get update \
-	&& apt-get install --no-install-recommends -y gnupg2 curl postgresql-client  \
+	&& apt-get install --no-install-recommends -y gnupg2=2.2.* curl=7.88.* postgresql-client-15=15.*  \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/* \
 	&& groupadd -g 1000 pguser \
