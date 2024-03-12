@@ -1,16 +1,18 @@
 # Use an official Debian as a parent image for a lightweight build
 FROM debian:stable-slim
 
-# Install PostgreSQL client and GPG
-RUN apt-get update && apt-get install --no-install-recommends -y gnupg2 curl postgresql-client && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Create a non-root user and group (using user ID 1000 and group ID 1000 for compatibility)
-# Fixed commands for Debian
-RUN groupadd -g 1000 pguser && \
-    useradd -m -u 1000 -g pguser pguser
-
 # Set the GNUPGHOME environment variable
 ENV GNUPGHOME=/home/pguser/.gnupg
+
+# Install PostgreSQL client and GPG
+# Create a non-root user and group (using user ID 1000 and group ID 1000 for compatibility)
+# Fixed commands for Debian
+RUN apt-get update \
+	&& apt-get install --no-install-recommends -y gnupg2 curl postgresql-client  \
+	&& apt-get clean \
+	&& rm -rf /var/lib/apt/lists/* \
+	&& groupadd -g 1000 pguser \
+	&& useradd -m -u 1000 -g pguser pguser
 
 # Set working directory
 WORKDIR /home/pguser
