@@ -8,7 +8,8 @@ naca0008 = asb.Airfoil("naca0008")
 
 
 def make_airplane(
-    n_booms, wing_span,
+    n_booms,
+    wing_span,
 ):
     # n_booms = 3
 

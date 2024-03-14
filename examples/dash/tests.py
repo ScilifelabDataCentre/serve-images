@@ -6,8 +6,15 @@ n_booms = 1
 wing_span = 40
 alpha = 5
 
-airplane = make_airplane(n_booms=n_booms, wing_span=wing_span,)
-op_point = asb.OperatingPoint(density=0.10, velocity=20, alpha=alpha,)
+airplane = make_airplane(
+    n_booms=n_booms,
+    wing_span=wing_span,
+)
+op_point = asb.OperatingPoint(
+    density=0.10,
+    velocity=20,
+    alpha=alpha,
+)
 
 ### LL
 # Run an analysis
@@ -28,4 +35,3 @@ except RuntimeError:
 # Postprocess
 # ap.substitute_solution(sol)
 ap.draw(show=False).show()
-

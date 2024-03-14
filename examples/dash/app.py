@@ -48,7 +48,11 @@ app.layout = dbc.Container(
                                     max=3,
                                     step=1,
                                     value=3,
-                                    marks={1: "1", 2: "2", 3: "3",},
+                                    marks={
+                                        1: "1",
+                                        2: "2",
+                                        3: "3",
+                                    },
                                 ),
                                 html.P("Wing Span [m]:"),
                                 dcc.Input(id="wing_span", value=43, type="number"),
@@ -87,7 +91,10 @@ app.layout = dbc.Container(
                         html.Div(
                             [
                                 html.H5("Aerodynamic Performance"),
-                                dbc.Spinner(html.P(id="output"), color="primary",),
+                                dbc.Spinner(
+                                    html.P(id="output"),
+                                    color="primary",
+                                ),
                             ]
                         ),
                     ],
@@ -141,10 +148,19 @@ def make_table(dataframe):
         Input("run_ll_analysis", "n_clicks_timestamp"),
         Input("run_vlm_analysis", "n_clicks_timestamp"),
     ],
-    [State("n_booms", "value"), State("wing_span", "value"), State("alpha", "value"),],
+    [
+        State("n_booms", "value"),
+        State("wing_span", "value"),
+        State("alpha", "value"),
+    ],
 )
 def display_geometry(
-    display_geometry, run_ll_analysis, run_vlm_analysis, n_booms, wing_span, alpha,
+    display_geometry,
+    run_ll_analysis,
+    run_vlm_analysis,
+    n_booms,
+    wing_span,
+    alpha,
 ):
     ### Figure out which button was clicked
     try:
@@ -162,8 +178,15 @@ def display_geometry(
         button_pressed = 0
 
     ### Make the airplane
-    airplane = make_airplane(n_booms=n_booms, wing_span=wing_span,)
-    op_point = asb.OperatingPoint(density=0.10, velocity=20, alpha=alpha,)
+    airplane = make_airplane(
+        n_booms=n_booms,
+        wing_span=wing_span,
+    )
+    op_point = asb.OperatingPoint(
+        density=0.10,
+        velocity=20,
+        alpha=alpha,
+    )
     if button_pressed == 0:
         # Display the geometry
         figure = airplane.draw(show=False, colorbar_title=None)
@@ -242,7 +265,12 @@ def display_geometry(
         autosize=True,
         # width=1000,
         # height=700,
-        margin=dict(l=0, r=0, b=0, t=0,),
+        margin=dict(
+            l=0,
+            r=0,
+            b=0,
+            t=0,
+        ),
     )
 
     return (figure, output)
