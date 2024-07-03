@@ -1,4 +1,4 @@
-FROM openanalytics/shinyproxy:3.0.2
+FROM openanalytics/shinyproxy:3.1.1
 
 ENV SHINY_USER shinyproxy
 
