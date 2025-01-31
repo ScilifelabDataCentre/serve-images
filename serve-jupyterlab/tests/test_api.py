@@ -73,11 +73,19 @@ def test_notebook():
     cell_outputs = _get_notebook_cell_outputs(
         headers, HOST, NOTEBOOK_PATH, TIMEOUT_CALL
     )
-    assert len(cell_outputs) == 1, len(cell_outputs)
+    assert len(cell_outputs) == 3, len(cell_outputs)
 
     val = cell_outputs[0]
     assert type(val) == str
     assert val == "9", val
+
+    lfs_init_val = cell_outputs[1]
+    assert type(lfs_init_val) == str
+    assert lfs_init_val == "Git LFS initialized.", lfs_init_val
+    
+    lfs_ver_val = cell_outputs[2]
+    assert type(lfs_ver_val) == str
+    assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux arm64; go 1.18.1)", lfs_ver_val
 
 
 def test_shutdown():
