@@ -50,6 +50,41 @@ jobs:
           pip install -r ./serve-jupyterlab/tests/requirements.txt
           python3 -m pytest ./serve-jupyterlab
 
+          - name: Checkout repository with LFS
+          uses: actions/checkout@v4
+          with:
+            lfs: true
+            fetch-depth: 0  # Ensure we fetch all branches
+  
+      - name: Verify Git LFS installation
+        run: git lfs version
+  
+      - name: Initialize Git LFS
+        run: git lfs install
+  
+      - name: Create temporary test branch
+        run: |
+          TEMP_BRANCH="lfs-test-branch-$(date +%s)"
+          git checkout -b $TEMP_BRANCH
+          echo "Test LFS file" > test-lfs.bin
+          git lfs track "*.bin"
+          git add .gitattributes test-lfs.bin
+          git commit -m "Add test LFS file"
+          git push origin $TEMP_BRANCH
+  
+      - name: Verify LFS file tracking
+        run: git lfs ls-files
+  
+      - name: Fetch and pull LFS files
+        run: |
+          git lfs fetch
+          git lfs pull
+  
+      - name: Cleanup temporary branch
+        if: always()
+        run: |
+          git push origin --delete $TEMP_BRANCH || true
+
   push: 
     if: | 
       github.ref == 'refs/heads/main' &&
