@@ -61,6 +61,11 @@ jobs:
   
       - name: Initialize Git LFS
         run: git lfs install
+
+      - name: Set up Git user
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
   
       - name: Create temporary test branch
         run: |
