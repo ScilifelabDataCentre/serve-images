@@ -50,11 +50,11 @@ jobs:
           pip install -r ./serve-jupyterlab/tests/requirements.txt
           python3 -m pytest ./serve-jupyterlab
 
-          - name: Checkout repository with LFS
-          uses: actions/checkout@v4
-          with:
-            lfs: true
-            fetch-depth: 0  # Ensure we fetch all branches
+      - name: Checkout repository with LFS
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0  # Ensure we fetch all branches
   
       - name: Verify Git LFS installation
         run: git lfs version
