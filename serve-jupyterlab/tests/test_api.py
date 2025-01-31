@@ -83,7 +83,9 @@ def test_notebook():
     assert isinstance(lfs_init_val, str)
     assert lfs_init_val == "Git LFS initialized.", lfs_init_val
     lfs_ver_val = cell_outputs[2]
-    assert isinstance(lfs_ver_val, str)
+    assert type(lfs_ver_val) == str
+    # Since we are installing the latest version, it's okay if this fails. 
+    # Update the version here if needed.
     assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)", lfs_ver_val
 
 
