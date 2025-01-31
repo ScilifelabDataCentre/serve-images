@@ -78,11 +78,10 @@ def test_notebook():
     val = cell_outputs[0]
     assert type(val) == str
     assert val == "9", val
-
+    # check lfs installation
     lfs_init_val = cell_outputs[1]
     assert type(lfs_init_val) == str
     assert lfs_init_val == "Git LFS initialized.", lfs_init_val
-    
     lfs_ver_val = cell_outputs[2]
     assert type(lfs_ver_val) == str
     assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)", lfs_ver_val
