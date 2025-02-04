@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install curl -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update && \
-    apt-get install -y \
+    apt-get install -y --no-install-recommends \
     wget \
     build-essential \
     tcl \
@@ -21,19 +21,26 @@ RUN apt-get update && \
     environment-modules && \
     rm -rf /var/lib/apt/lists/*
 
-# Download and install modules-5.5.0 from source
+# Download and extract modules-5.5.0
 WORKDIR /tmp
-RUN wget https://github.com/cea-hpc/modules/releases/download/v5.5.0/modules-5.5.0.tar.gz && \
-    tar -xzf modules-5.5.0.tar.gz && \
-    cd modules-5.5.0 && \
-    ./configure --prefix=/usr/local && \
-    make && \
-    make install && \
-    cd .. && \
-    rm -rf modules-5.5.0 modules-5.5.0.tar.gz
+RUN wget https://github.com/cea-hpc/modules/releases/download/v5.5.0/modules-5.5.0.tar.gz -nv \
+    && tar -xzf modules-5.5.0.tar.gz \
+    && rm modules-5.5.0.tar.gz
+
+# Build and install from the extracted directory
+WORKDIR /tmp/modules-5.5.0
+RUN ./configure --prefix=/usr/local \
+    && make \
+    && make install
+
+# Clean up the source directory
+WORKDIR /tmp
+RUN rm -rf /tmp/modules-5.5.0
 
 # Set up the environment for modules
 RUN echo "source /usr/local/init/bash" >> /etc/bash.bashrc
+
+WORKDIR /home/jovyan
 
 USER $NB_UID
 RUN pip install --no-cache-dir -r /tmp/requirements.txt
