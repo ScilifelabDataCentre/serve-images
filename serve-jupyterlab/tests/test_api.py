@@ -87,7 +87,7 @@ def test_notebook():
     # Ensure the latest version here
     error_message = f"""
         Check the version here. 
-        If it’s different from expected, update the assert. 
+        If it is different from expected, update the assert. 
         Current version to check:
         "{lfs_ver_val}"
         """
