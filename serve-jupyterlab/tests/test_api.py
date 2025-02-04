@@ -92,7 +92,7 @@ def test_notebook():
         "{lfs_ver_val}"
         """
     assert (
-        lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)"
+        lfs_ver_val == "git-lfs/3.4.1 (GitHub; linux amd64; go 1.22.2)"
     ), error_message
 
 
