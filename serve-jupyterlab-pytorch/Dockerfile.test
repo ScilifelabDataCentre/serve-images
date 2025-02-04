@@ -43,7 +43,4 @@ RUN echo "source /usr/local/init/bash" >> /etc/bash.bashrc
 
 WORKDIR /home/jovyan
 
-USER $NB_UID
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
-
 CMD ["/bin/bash"]

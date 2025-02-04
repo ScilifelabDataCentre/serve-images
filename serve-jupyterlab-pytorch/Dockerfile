@@ -9,17 +9,14 @@ COPY requirements.txt /tmp
 USER root
 RUN apt-get update && apt-get install curl -y --no-install-recommends \
     && apt-get clean \
-    && apt-get install git-lfs  -y --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+    && apt-get install -y --no-install-recommends \
+    git-lfs \ 
     wget \
     build-essential \
     tcl \
     tcl-dev \
     environment-modules && \
-    rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Download and extract modules-5.5.0
 WORKDIR /tmp
@@ -41,9 +38,5 @@ RUN rm -rf /tmp/modules-5.5.0
 RUN echo "source /usr/local/init/bash" >> /etc/bash.bashrc
 
 WORKDIR /home/jovyan
-
-USER $NB_UID
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
-
 
 CMD ["/bin/bash"]
