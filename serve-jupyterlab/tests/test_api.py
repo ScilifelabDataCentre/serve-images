@@ -73,11 +73,27 @@ def test_notebook():
     cell_outputs = _get_notebook_cell_outputs(
         headers, HOST, NOTEBOOK_PATH, TIMEOUT_CALL
     )
-    assert len(cell_outputs) == 1, len(cell_outputs)
+    assert len(cell_outputs) == 3, len(cell_outputs)
 
     val = cell_outputs[0]
     assert type(val) == str
     assert val == "9", val
+    # check lfs installation
+    lfs_init_val = cell_outputs[1]
+    assert isinstance(lfs_init_val, str)
+    assert lfs_init_val == "Git LFS initialized.", lfs_init_val
+    lfs_ver_val = cell_outputs[2]
+    assert isinstance(lfs_ver_val, str)
+    # Ensure the latest version here
+    error_message = f"""
+        Check the version here. 
+        If it is different from expected, update the assert. 
+        Current version to check:
+        "{lfs_ver_val}"
+        """
+    assert (
+        lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)"
+    ), error_message
 
 
 def test_shutdown():
