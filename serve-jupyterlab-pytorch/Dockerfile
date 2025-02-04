@@ -37,5 +37,6 @@ RUN rm -rf /tmp/modules-5.5.0 && \
     echo "source /usr/local/init/bash" >> /etc/bash.bashrc
 
 WORKDIR /home/jovyan
+USER jovyan
 
 CMD ["/bin/bash"]
