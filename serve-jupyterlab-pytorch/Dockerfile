@@ -7,15 +7,15 @@ WORKDIR /home/jovyan
 COPY requirements.txt /tmp
 
 USER root
-RUN apt-get update && apt-get install curl -y --no-install-recommends \
-    && apt-get clean \
-    && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     git-lfs \ 
     wget \
     build-essential \
     tcl \
     tcl-dev \
     environment-modules && \
+    apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Download and extract modules-5.5.0
@@ -31,11 +31,10 @@ RUN ./configure --prefix=/usr/local \
     && make install
 
 # Clean up the source directory
-WORKDIR /tmp
-RUN rm -rf /tmp/modules-5.5.0
-
 # Set up the environment for modules
-RUN echo "source /usr/local/init/bash" >> /etc/bash.bashrc
+WORKDIR /tmp
+RUN rm -rf /tmp/modules-5.5.0 && \
+    echo "source /usr/local/init/bash" >> /etc/bash.bashrc
 
 WORKDIR /home/jovyan
 
