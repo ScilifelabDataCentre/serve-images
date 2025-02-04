@@ -1,0 +1,42 @@
+FROM quay.io/jupyter/pytorch-notebook:latest
+LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/serve-images
+
+ARG SERVE_BRANCH=develop
+WORKDIR /home/jovyan
+
+COPY tests/notebooks/basic.ipynb tests/basic.ipynb
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    git-lfs \ 
+    wget \
+    build-essential \
+    tcl \
+    tcl-dev \
+    environment-modules && \
+    apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Download and extract modules-5.5.0
+WORKDIR /tmp
+RUN wget https://github.com/cea-hpc/modules/releases/download/v5.5.0/modules-5.5.0.tar.gz -nv \
+    && tar -xzf modules-5.5.0.tar.gz \
+    && rm modules-5.5.0.tar.gz
+
+# Build and install from the extracted directory
+WORKDIR /tmp/modules-5.5.0
+RUN ./configure --prefix=/usr/local \
+    && make \
+    && make install
+
+# Clean up the source directory
+# Set up the environment for modules
+WORKDIR /tmp
+RUN rm -rf /tmp/modules-5.5.0 && \
+    echo "source /usr/local/init/bash" >> /etc/bash.bashrc
+
+WORKDIR /home/jovyan
+USER jovyan
+
+CMD ["/bin/bash"]
