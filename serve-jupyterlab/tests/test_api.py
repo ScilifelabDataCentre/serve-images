@@ -85,7 +85,13 @@ def test_notebook():
     lfs_ver_val = cell_outputs[2]
     assert isinstance(lfs_ver_val, str)
     # Ensure the latest version here
-    assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)", lfs_ver_val
+    error_message = f"""
+        Check the version here. 
+        If it’s different from expected, update the assert. 
+        Current version to check:
+        "{lfs_ver_val}"
+        """
+    assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)", error_message
 
 
 def test_shutdown():
