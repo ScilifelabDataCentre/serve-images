@@ -91,7 +91,9 @@ def test_notebook():
         Current version to check:
         "{lfs_ver_val}"
         """
-    assert lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)", error_message
+    assert (
+        lfs_ver_val == "git-lfs/3.0.2 (GitHub; linux amd64; go 1.18.1)"
+    ), error_message
 
 
 def test_shutdown():
