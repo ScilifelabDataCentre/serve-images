@@ -4,39 +4,14 @@ LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/se
 ARG SERVE_BRANCH=develop
 WORKDIR /home/jovyan
 
+COPY requirements.txt /tmp
 COPY tests/notebooks/basic.ipynb tests/basic.ipynb
 
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    git-lfs \ 
-    wget \
-    build-essential \
-    tcl \
-    tcl-dev \
-    environment-modules && \
-    apt-get clean \
+RUN apt-get update && apt-get install curl -y --no-install-recommends \
+    && apt-get clean \
+    && apt-get install git-lfs -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Download and extract modules-5.5.0
-WORKDIR /tmp
-RUN wget https://github.com/cea-hpc/modules/releases/download/v5.5.0/modules-5.5.0.tar.gz -nv \
-    && tar -xzf modules-5.5.0.tar.gz \
-    && rm modules-5.5.0.tar.gz
-
-# Build and install from the extracted directory
-WORKDIR /tmp/modules-5.5.0
-RUN ./configure --prefix=/usr/local \
-    && make \
-    && make install
-
-# Clean up the source directory
-# Set up the environment for modules
-WORKDIR /tmp
-RUN rm -rf /tmp/modules-5.5.0 && \
-    echo "source /usr/local/init/bash" >> /etc/bash.bashrc
-
-WORKDIR /home/jovyan
-USER jovyan
-
-CMD ["/bin/bash"]
+USER $NB_UID
+RUN pip install --no-cache-dir -r /tmp/requirements.txt
