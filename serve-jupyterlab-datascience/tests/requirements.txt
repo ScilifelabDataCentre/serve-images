@@ -1,6 +1,0 @@
-black
-requests
-docker
-pytest
-nbval
-websocket-client

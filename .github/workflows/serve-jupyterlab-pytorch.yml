@@ -31,8 +31,9 @@ jobs:
 
       - name: Build test image
         run: |
+            cp ./serve-jupyterlab-tests/basic.ipynb ./serve-jupyterlab-pytorch/
             docker build -t test-image -f ./serve-jupyterlab-pytorch/Dockerfile.test ./serve-jupyterlab-pytorch
-
+            rm ./serve-jupyterlab-pytorch/basic.ipynb
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.7.1
         with:
@@ -47,8 +48,8 @@ jobs:
         env:
           IMAGE_NAME: test-image
         run: | 
-          pip install -r ./serve-jupyterlab-pytorch/tests/requirements.txt
-          python3 -m pytest ./serve-jupyterlab-pytorch
+          pip install -r ./serve-jupyterlab-tests/requirements.txt
+          python3 -m pytest ./serve-jupyterlab-tests
 
   push: 
     if: | 
