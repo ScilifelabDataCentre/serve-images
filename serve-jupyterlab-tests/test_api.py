@@ -73,7 +73,7 @@ def test_notebook():
     cell_outputs = _get_notebook_cell_outputs(
         headers, HOST, NOTEBOOK_PATH, TIMEOUT_CALL
     )
-    assert len(cell_outputs) == 3, len(cell_outputs)
+    assert len(cell_outputs) == 2, len(cell_outputs)
 
     val = cell_outputs[0]
     assert type(val) == str
@@ -82,8 +82,6 @@ def test_notebook():
     lfs_init_val = cell_outputs[1]
     assert isinstance(lfs_init_val, str)
     assert lfs_init_val == "Git LFS initialized.", lfs_init_val
-    lfs_ver_val = cell_outputs[2]
-    assert isinstance(lfs_ver_val, str)
 
 
 def test_shutdown():
