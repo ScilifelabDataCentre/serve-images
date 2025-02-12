@@ -35,15 +35,25 @@ jobs:
             docker build -t test-image -f ./serve-jupyterlab-datascience/Dockerfile.test ./serve-jupyterlab-datascience
             rm ./serve-jupyterlab-datascience/basic.ipynb
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.7.1
+      - name: Display all HIGH vulnerabilities using Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
         with:
           image-ref: 'test-image'
           format: 'table'
-          severity: 'CRITICAL,HIGH'
-          security-checks: 'vuln'
+          vuln-type: 'os,library'
+          severity: 'HIGH'
           timeout: '30m0s'
           exit-code: '0'
+
+      - name: Fail only if CRITICAL vulnerabilities found using Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+            image-ref: 'test-image'
+            format: 'table'
+            vuln-type: 'os,library'
+            severity: 'CRITICAL'
+            timeout: '30m0s'
+            exit-code: '1'
 
       - name: Run tests
         env:

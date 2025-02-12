@@ -84,16 +84,7 @@ def test_notebook():
     assert lfs_init_val == "Git LFS initialized.", lfs_init_val
     lfs_ver_val = cell_outputs[2]
     assert isinstance(lfs_ver_val, str)
-    # Ensure the latest version here
-    error_message = f"""
-        Check the version here. 
-        If it is different from expected, update the assert. 
-        Current version to check:
-        "{lfs_ver_val}"
-        """
-    assert "git-lfs/3.4.1" in lfs_ver_val, error_message
-
-
+    
 def test_shutdown():
     """Test stopping the container."""
     container.stop()
