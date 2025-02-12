@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "serve-jupyterlab-pytorch/**"
+      - "serve-jupyterlab-tests/**"
   # Adds ability to run this workflow manually
   workflow_dispatch:
     inputs:
