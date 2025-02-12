@@ -84,7 +84,8 @@ def test_notebook():
     assert lfs_init_val == "Git LFS initialized.", lfs_init_val
     lfs_ver_val = cell_outputs[2]
     assert isinstance(lfs_ver_val, str)
-    
+
+
 def test_shutdown():
     """Test stopping the container."""
     container.stop()
