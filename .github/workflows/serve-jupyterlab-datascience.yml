@@ -54,7 +54,7 @@ jobs:
             vuln-type: 'os,library'
             severity: 'CRITICAL'
             timeout: '30m0s'
-            # We are allowing it just for now
+            # We are allowing it just for  now
             # please ensure it later
             # so that critical error is
             # handled gracefully
