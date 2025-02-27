@@ -83,8 +83,8 @@ RUN useradd -s /bin/bash -N -u ${UID} -l ${USER} \
 RUN echo "TZ=Etc/UTC" >> ${R_HOME}/etc/Renviron.site
 
 # Set default CRAN repo to RSPM (it has pre-compiled R packages, increasing user install speed)
-RUN echo 'options(repos=c(CRAN="https://packagemanager.rstudio.com/all/__linux__/focal/latest"))' >>  ${R_HOME}/etc/Rprofile.site \
-    && echo 'options(HTTPUserAgent=sprintf("R/%s R (%s)", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))' >> ${R_HOME}/etc/Rprofile.site
+RUN echo "options(repos=c(CRAN=\"https://packagemanager.rstudio.com/all/__linux__/focal/latest\"))" >>  ${R_HOME}/etc/Rprofile.site \
+    && echo "options(HTTPUserAgent=sprintf(\"R/%s R (%s)\", getRversion(), paste(getRversion(), R.version$platform, R.version$arch, R.version$os)))" >> ${R_HOME}/etc/Rprofile.site
 
 
 WORKDIR $HOME
