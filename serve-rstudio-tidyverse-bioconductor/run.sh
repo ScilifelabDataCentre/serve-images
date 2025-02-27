@@ -2,9 +2,9 @@
 # using rstudio with non-root and `--auth-none=1` inexplicably requires USER to be set
 echo -e "password123\n${PASSWORD}\n${PASSWORD}" | passwd
 
-echo "Starting server..."
+echo "Starting RStudio Server..."
 
-/usr/lib/rstudio-server/bin/rserver \
+exec /usr/lib/rstudio-server/bin/rserver \
   --server-daemonize=0 \
   --server-working-dir=${HOME} \
   --server-user=${USER} \
