@@ -1,7 +1,7 @@
 FROM ubuntu:20.04 AS base
 
 ARG RSTUDIO_ARCH="amd64"
-ARG RSTUDIO_VERSION=2023.03.0+386
+ARG RSTUDIO_VERSION=2024.12.1+563
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
@@ -46,8 +46,8 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD5
     && apt-get autoremove -yq && apt-get autoclean -yq
 
 # INSTALL RStudio Server
-RUN curl -sL "https://download2.rstudio.org/server/bionic/${RSTUDIO_ARCH}/rstudio-server-${RSTUDIO_VERSION//+/-}-${RSTUDIO_ARCH}.deb" -o /tmp/rstudio-server.deb \
- && gpg --keyserver keys.gnupg.net --keyserver pgp.surfnet.nl --recv-keys 3F32EE77E331692F \
+RUN curl -sL "https://download2.rstudio.org/server/focal/${RSTUDIO_ARCH}/rstudio-server-${RSTUDIO_VERSION//+/-}-${RSTUDIO_ARCH}.deb" -o /tmp/rstudio-server.deb \
+ && gpg --keyserver keyserver.ubuntu.com --recv-keys 19F92D60 \
  && dpkg-sig --verify /tmp/rstudio-server.deb \
  && dpkg -i /tmp/rstudio-server.deb \
  && rm -f /tmp/rstudio-server.deb \
