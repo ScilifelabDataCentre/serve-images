@@ -12,7 +12,3 @@
     background-color: var(--serve-lime);
     box-shadow: 0 0.5rem 1rem rgba(var(--bs-body-color-rgb), .15) !important;
 }
-
-.credits {
-    display: none;
-}
