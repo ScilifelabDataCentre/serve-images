@@ -1,17 +1,34 @@
 FROM ubuntu:latest
 
-RUN apt-get update && apt-get install curl software-properties-common -y --no-install-recommends \
-    && apt-get install python3.8 python3-pip -y --no-install-recommends \
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    software-properties-common \
+    git \
+    git-lfs \
+    python3 \
+    python3-pip \
+    python3-venv \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install git git-lfs -y --no-install-recommends \
-    && pip3 install --no-cache-dir git+https://@github.com/scaleoutsystems/stackn@feature/STACKN-267#subdirectory=cli
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN curl -fsSL https://code-server.dev/install.sh | /bin/bash
+# Create user and set up virtual environment
+RUN useradd -m serve
+USER serve
+WORKDIR /home/serve
 
-RUN useradd -m stackn
-USER stackn
+# Create virtual environment and install Python packages
+RUN python3 -m venv venv
+RUN /home/serve/venv/bin/pip install --upgrade pip \
+    && /home/serve/venv/bin/pip install --no-cache-dir \
+    jupyter
 
-CMD ["/bin/bash", "-c", "/usr/bin/code-server --auth=none --bind-addr=localhost:1234"]
+# Install Jupyter extension and configure environment
+RUN code-server --install-extension ms-toolsai.jupyter
+ENV PATH="/home/stackn/venv/bin:${PATH}"
+
+# Start code-server with Python from virtual environment
+CMD ["/bin/bash", "-c", "/usr/bin/code-server --auth=none --bind-addr=0.0.0.0:1234"]
