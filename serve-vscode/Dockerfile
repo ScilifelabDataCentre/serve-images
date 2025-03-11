@@ -16,8 +16,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Create user and set up virtual environment
-RUN useradd -m serve
+RUN useradd -m serve \
+    && mkdir -p /home/serve \
+    && chown -R serve:serve /home/serve
+
+# Switch to non-root user
 USER serve
 WORKDIR /home/serve
 
@@ -40,4 +43,4 @@ RUN mkdir -p /home/serve/.local/share/code-server/User \
     > /home/serve/.local/share/code-server/User/settings.json
 
 # Start code-server with Python from virtual environment
-CMD ["/bin/bash", "-c", "/usr/bin/code-server --auth=none --bind-addr=0.0.0.0:1234"]
+CMD ["/bin/bash", "-c", "/usr/bin/code-server --auth=none --bind-addr=0.0.0.0:1234 /home/serve/"]
