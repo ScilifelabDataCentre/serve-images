@@ -30,14 +30,13 @@ RUN /home/serve/.venv/bin/pip install --upgrade pip \
     && /home/serve/.venv/bin/pip install --no-cache-dir \
     jupyter
 
-# Install Jupyter extension and configure environment
-RUN code-server --install-extension ms-toolsai.jupyter
+# Install Python and Jupyter extension and configure environment
+RUN code-server --install-extension ms-python.python \
+    && code-server --install-extension ms-toolsai.jupyter
+
+# Configure environment and Python path for VS Code
 ENV PATH="/home/serve/.venv/bin:${PATH}"
 
-# Install Python extension
-RUN code-server --install-extension ms-python.python
-
-# Configure Python path for VS Code
 RUN mkdir -p /home/serve/.local/share/code-server/User \
     && echo '{"python.defaultInterpreterPath": "/home/serve/.venv/bin/python3"}' \
     > /home/serve/.local/share/code-server/User/settings.json
