@@ -16,7 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-RUN useradd -m serve \
+RUN useradd -u 1001 -m serve \
     && mkdir -p /home/serve \
     && chown -R serve:serve /home/serve
 
