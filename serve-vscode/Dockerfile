@@ -16,21 +16,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-RUN useradd -m serve \
-    && mkdir -p /home/serve \
-    && chown -R serve:serve /home/serve
-
-# Switch to non-root user
-USER serve
+# Create user with group id 1000 and assign permissions.
+# User id is 1001 because 1000 is already assigned
+# with default user 'ubuntu', which is auto-created 
+# with this ubuntu image
+RUN useradd -u 1001 -g 1000 -m serve && \
+    mkdir -p /home/serve && \
+    chown -R serve:1000 /home/serve && \
+    chmod -R 770 /home/serve
+    
+# Switch to non-root user. Number instead of name is mandatory for 
+# working 'runAsGroup' in chart after disabling 'runAsUser'
+USER 1001
 WORKDIR /home/serve
 
-# Create virtual environment and install Python packages
+# Create virtual environment and install Jupyter
 RUN python3 -m venv .venv
 RUN /home/serve/.venv/bin/pip install --upgrade pip \
     && /home/serve/.venv/bin/pip install --no-cache-dir \
     jupyter
 
-# Install Python and Jupyter extension and configure environment
+# Install VScode Python and Jupyter extension
 RUN code-server --install-extension ms-python.python \
     && code-server --install-extension ms-toolsai.jupyter
 
