@@ -27,7 +27,7 @@ RUN useradd -u 1001 -g 1000 -m serve && \
 USER 1001
 WORKDIR /home/serve
 # Force login shell for all subsequent commands to source custom_umask.sh
-SHELL ["/bin/bash", "-l", "-o", "pipefail", "-c"]  
+SHELL ["/bin/bash", "-l", "-o", "pipefail", "-c"]
 
 # Create virtual environment and install Jupyter
 RUN python3 -m venv .venv

@@ -13,13 +13,13 @@ on:
         type: choice
         options:
         - info
-        - warning  
+        - warning
         - debug
       tags:
         description: 'Manual run'
         required: false
         type: boolean
-    
+
 
 jobs:
 
@@ -61,12 +61,12 @@ jobs:
       - name: Run tests
         env:
           IMAGE_NAME: test-image
-        run: | 
+        run: |
           pip install -r ./serve-vscode/requirements.txt
           python3 -m pytest ./serve-vscode
 
-  push: 
-    if: | 
+  push:
+    if: |
       github.ref == 'refs/heads/main' &&
       github.repository == 'scilifelabdatacentre/serve-images'
     runs-on: ubuntu-latest
@@ -76,7 +76,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
     - name: 'Checkout github action'
       uses: actions/checkout@main
