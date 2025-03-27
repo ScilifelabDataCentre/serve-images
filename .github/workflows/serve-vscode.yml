@@ -13,17 +13,60 @@ on:
         type: choice
         options:
         - info
-        - warning  
+        - warning
         - debug
       tags:
         description: 'Manual run'
         required: false
         type: boolean
-    
+
 
 jobs:
-  push: 
-    if: | 
+
+  build_and_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout GitHub Action
+        uses: actions/checkout@main
+
+      - name: Build test image
+        run: |
+            docker build -t test-image -f ./serve-vscode/Dockerfile.test ./serve-vscode
+
+      - name: Display all HIGH vulnerabilities using Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'test-image'
+          format: 'table'
+          vuln-type: 'os,library'
+          severity: 'HIGH'
+          timeout: '30m0s'
+          exit-code: '0'
+
+      - name: Fail only if CRITICAL vulnerabilities found using Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+            image-ref: 'test-image'
+            format: 'table'
+            vuln-type: 'os,library'
+            severity: 'CRITICAL'
+            timeout: '30m0s'
+            # We are allowing it just for  now
+            # please ensure it later
+            # so that critical error is
+            # handled gracefully
+            exit-code: '0'
+
+      - name: Run tests
+        env:
+          IMAGE_NAME: test-image
+        run: |
+          pip install -r ./serve-vscode/requirements.txt
+          python3 -m pytest ./serve-vscode
+
+  push:
+    if: |
       github.ref == 'refs/heads/main' &&
       github.repository == 'scilifelabdatacentre/serve-images'
     runs-on: ubuntu-latest
@@ -33,7 +76,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-    
+
     steps:
     - name: 'Checkout github action'
       uses: actions/checkout@main
