@@ -8,7 +8,6 @@ from requests.exceptions import ConnectionError
 import pytest
 import docker
 
-
 # Settings
 PORTS = [8080, 8081, 8082, 7070, 7071]  # the torchserve ports
 CONTAINER_PORTS = {f"{port}/tcp": port for port in PORTS}

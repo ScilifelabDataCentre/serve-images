@@ -10,7 +10,6 @@ import docker
 import json
 import numpy as np
 
-
 # Settings
 PORTS = [8501]  # the fastapi port
 CONTAINER_PORTS = {f"{port}/tcp": port for port in PORTS}

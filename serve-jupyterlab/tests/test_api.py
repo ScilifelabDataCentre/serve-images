@@ -11,7 +11,6 @@ from websocket import create_connection
 import pytest
 import docker
 
-
 # Settings
 PORT = 8888  # the jupyter-lab port
 HOST = f"localhost:{PORT}"  # the host
