@@ -1,0 +1,26 @@
+vulnerabilities:
+  - id: CVE-2026-53398
+    purls:
+      - "pkg:deb/ubuntu/linux-libc-dev"
+    expired_at: 2026-09-25
+    statement: Ubuntu 24.04 has no fixed linux-libc-dev package as of 2026-08-25; tracked in SS-2002.
+  - id: CVE-2026-63940
+    purls:
+      - "pkg:deb/ubuntu/linux-libc-dev"
+    expired_at: 2026-09-25
+    statement: Ubuntu 24.04 has no fixed linux-libc-dev package as of 2026-08-25; tracked in SS-2002.
+  - id: CVE-2026-64535
+    purls:
+      - "pkg:deb/ubuntu/linux-libc-dev"
+    expired_at: 2026-09-25
+    statement: Ubuntu 24.04 has no fixed linux-libc-dev package as of 2026-08-25; tracked in SS-2002.
+  - id: CVE-2026-64564
+    purls:
+      - "pkg:deb/ubuntu/linux-libc-dev"
+    expired_at: 2026-09-25
+    statement: Ubuntu 24.04 has no fixed linux-libc-dev package as of 2026-08-25; tracked in SS-2002.
+  - id: CVE-2026-74394
+    purls:
+      - "pkg:deb/ubuntu/linux-libc-dev"
+    expired_at: 2026-09-25
+    statement: Ubuntu 24.04 has no fixed linux-libc-dev package as of 2026-08-25; tracked in SS-2002.
