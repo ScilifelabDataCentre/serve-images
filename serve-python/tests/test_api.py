@@ -1,114 +1,94 @@
-"""Tests of the python image."""
+"""Tests of the Python serving image."""
 
+import json
 import os
 import time
-import random as rnd
-import requests
-from requests.exceptions import ConnectionError
-import pytest
-import docker
-import json
-import numpy as np
 
-# Settings
-PORTS = [8501]  # the fastapi port
-CONTAINER_PORTS = {f"{port}/tcp": port for port in PORTS}
-TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
+import docker
+import pytest
+import requests
+from requests.exceptions import RequestException
+
+PORT = 8501
+CONTAINER_PORTS = {f"{PORT}/tcp": None}
+TIMEOUT_CALL = 5
+STARTUP_TIMEOUT = 300
 
 client = docker.from_env()
-container = client.containers.run(
-    os.environ["IMAGE_NAME"],
-    ports=CONTAINER_PORTS,
-    detach=True,
-)
-time.sleep(20)
-container.reload()
 
 
-def test_container_status():
-    """Test that the python container is running."""
+@pytest.fixture(scope="module")
+def container():
+    """Run the image on a random host port and clean it up after the tests."""
+    container = client.containers.run(
+        os.environ["IMAGE_NAME"],
+        ports=CONTAINER_PORTS,
+        detach=True,
+    )
+    try:
+        _wait_for_ready(container)
+        yield container
+    finally:
+        container.stop()
+        container.remove()
+        client.close()
+
+
+def test_container_status(container):
+    """Test that the Python container is running."""
+    container.reload()
     assert container.status == "running"
 
 
-def test_container_ports():
-    """Test of the expected container ports."""
-    assert all(
-        PORTS[i] == int(key.split("/")[0])
-        for i, (key, _) in enumerate(container.ports.items())
-    )
-
-
-def test_container_access():
-    """Test of basic communication with the container returns status 200 (OK)."""
-    max_attempts = 20
-    for attempt in range(1, max_attempts + 1):
-        try:
-            url = _get_api_url(container) + "/health"
-            response = requests.get(url, timeout=TIMEOUT_CALL)
-            if response.status_code == 200:
-                assert True
-                break
-        except:
-            pass
-        if attempt == max_attempts:
-            RuntimeError(
-                f"Python Deployment did not become ready after {max_attempts} attempts"
-            )
-            assert False
-
-        print(
-            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
-        )
-        time.sleep(10)
-
-
-def test_prediction():
-    """Verify that the model can be used for predictions."""
-    max_attempts = 20
-    for attempt in range(1, max_attempts + 1):
-        # Set input string
-        example = "Jag är ett barn, och det här är mitt hem. Alltså är det ett barnhem!"
-        # msk_ind takes an index in order to mask (or hide) one of the word in the example sentence, which should then be predicted by the BERT trained model
-        msk_ind = 4
-        url = _get_api_url(container) + "/predict/"
-        res = requests.post(url, json={"pred": example, "msk_ind": msk_ind})
-        text_encoded = res.json().encode("latin1")
-        text_decoded = text_encoded.decode("unicode-escape")
-        print(json.loads(text_decoded))
-        if res.status_code == 200:
-            assert json.loads(text_decoded) == {
-                "result": ["barn", "hem", "hus", "spädbarn", "##hem"]
-            }
-            break
-        if attempt == max_attempts:
-            RuntimeError(
-                f"Python Deployment did not become ready after {max_attempts} attempts"
-            )
-            assert False
-
-        print(
-            f"Attempt {attempt} failed, waiting for 10 seconds before trying again..."
-        )
-        time.sleep(10)
-
-
-def test_shutdown():
-    container.stop()
+def test_container_ports(container):
+    """Test that the serving port is published."""
     container.reload()
-    assert container.status == "removing" or container.status == "exited"
-    container.remove()
-    client.close()
+    assert container.ports[f"{PORT}/tcp"]
 
 
-# Private methods
+def test_container_access(container):
+    """Test that the health endpoint returns status 200."""
+    response = requests.get(_get_api_url(container) + "/health", timeout=TIMEOUT_CALL)
+    assert response.status_code == 200
 
 
-def _get_ip(container):
-    """Gets the IP of the container."""
-    return container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+def test_prediction(container):
+    """Verify that the model can be used for predictions."""
+    response = requests.post(
+        _get_api_url(container) + "/predict/",
+        json={
+            "pred": "Jag är ett barn, och det här är mitt hem. Alltså är det ett barnhem!",
+            "msk_ind": 4,
+        },
+        timeout=60,
+    )
+    response.raise_for_status()
+    text_encoded = response.json().encode("latin1")
+    prediction = json.loads(text_encoded.decode("unicode-escape"))
+    assert prediction == {"result": ["barn", "hem", "hus", "spädbarn", "##hem"]}
 
 
 def _get_api_url(container):
-    """Gets the correct adress for inference."""
-    url = "http://{}:{}".format(_get_ip(container), PORTS[0])
-    return url
+    """Get the localhost URL for the port published by Docker."""
+    container.reload()
+    host_port = container.ports[f"{PORT}/tcp"][0]["HostPort"]
+    return f"http://127.0.0.1:{host_port}"
+
+
+def _wait_for_ready(container):
+    deadline = time.monotonic() + STARTUP_TIMEOUT
+    while time.monotonic() < deadline:
+        container.reload()
+        if container.status != "running":
+            raise RuntimeError(container.logs().decode())
+        try:
+            response = requests.get(
+                _get_api_url(container) + "/health",
+                timeout=TIMEOUT_CALL,
+            )
+            if response.status_code == 200:
+                return
+        except RequestException:
+            pass
+        time.sleep(2)
+    raise TimeoutError("Python deployment did not become ready in time")

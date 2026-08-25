@@ -38,7 +38,7 @@ jobs:
           format: "sarif"
           output: "trivy-results-jupyterlab-latest.sarif"
           severity: "CRITICAL,HIGH"
-          security-checks: 'vuln'
+          scanners: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 
@@ -57,7 +57,7 @@ jobs:
           format: "sarif"
           output: "trivy-results-rstudio-latest.sarif"
           severity: "CRITICAL,HIGH"
-          security-checks: 'vuln'
+          scanners: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 
@@ -76,7 +76,7 @@ jobs:
           format: "sarif"
           output: "trivy-results-torchserve-latest.sarif"
           severity: "CRITICAL,HIGH"
-          security-checks: 'vuln'
+          scanners: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 
@@ -95,7 +95,7 @@ jobs:
           format: "sarif"
           output: "trivy-results-mlflow-image-latest.sarif"
           severity: "CRITICAL,HIGH"
-          security-checks: 'vuln'
+          scanners: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 

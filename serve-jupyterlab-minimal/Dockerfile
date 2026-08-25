@@ -1,4 +1,4 @@
-FROM jupyter/minimal-notebook:latest
+FROM quay.io/jupyter/minimal-notebook:latest
 LABEL org.opencontainers.image.source https://github.com/scilifelabdatacentre/serve-images
 
 ARG SERVE_BRANCH=develop

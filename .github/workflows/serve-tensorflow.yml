@@ -39,7 +39,7 @@ jobs:
           image-ref: 'test-image'
           format: 'table'
           severity: 'CRITICAL,HIGH'
-          security-checks: 'vuln'
+          scanners: 'vuln'
           timeout: '30m0s'
           exit-code: '0'
 

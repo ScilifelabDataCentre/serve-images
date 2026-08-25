@@ -36,13 +36,13 @@ jobs:
             docker build -t test-image -f ./serve-jupyterlab-tensorflow/Dockerfile.test ./serve-jupyterlab-tensorflow
             rm ./serve-jupyterlab-tensorflow/basic.ipynb
 
-      - name: Display all HIGH vulnerabilities using Trivy vulnerability scanner
+      - name: Display all HIGH and CRITICAL vulnerabilities using Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
               image-ref: 'test-image'
               format: 'table'
               vuln-type: 'os,library'
-              severity: 'HIGH'
+              severity: 'CRITICAL,HIGH'
               timeout: '30m0s'
               exit-code: '0'
     

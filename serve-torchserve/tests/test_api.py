@@ -1,131 +1,174 @@
-"""Tests of the torchserve image."""
+"""Tests of the TorchServe image."""
 
+import json
 import os
-import time
 import random as rnd
-import requests
-from requests.exceptions import ConnectionError
-import pytest
+import time
+
 import docker
+import pytest
+import requests
+from requests.exceptions import RequestException
 
 # Settings
-PORTS = [8080, 8081, 8082, 7070, 7071]  # the torchserve ports
-CONTAINER_PORTS = {f"{port}/tcp": port for port in PORTS}
-TIMEOUT_CALL = 5  # the timeout in seconds of the client request call
+PORTS = [8080, 8081, 8082, 7070, 7071]
+CONTAINER_PORTS = {f"{port}/tcp": None for port in PORTS}
+TIMEOUT_CALL = 5
+STARTUP_TIMEOUT = 60
 
 client = docker.from_env()
-container = client.containers.run(
-    os.environ["IMAGE_NAME"],
-    ports=CONTAINER_PORTS,
-    detach=True,
-)
-time.sleep(20)
-container.reload()
 
 
-def test_torchserve_status():
-    """Test that the torchserve container is running."""
+@pytest.fixture(scope="module")
+def torchserve():
+    """Run TorchServe with random host ports and clean it up after the tests."""
+    container = client.containers.run(
+        os.environ["IMAGE_NAME"],
+        ports=CONTAINER_PORTS,
+        detach=True,
+    )
+    try:
+        tokens = _wait_for_tokens(container)
+        _wait_for_ready(container, tokens["inference"]["key"])
+        yield container, tokens
+    finally:
+        container.stop()
+        container.remove()
+
+
+def test_torchserve_status(torchserve):
+    """Test that the TorchServe container is running."""
+    container, _ = torchserve
+    container.reload()
     assert container.status == "running"
 
 
-def test_torchserve_ports():
-    """Test of the expected container ports."""
-    assert all(
-        value[0]["HostPort"] == key.split("/")[0]
-        for key, value in container.ports.items()
+def test_torchserve_ports(torchserve):
+    """Test that all expected container ports are published."""
+    container, _ = torchserve
+    container.reload()
+    assert all(container.ports[f"{port}/tcp"] for port in PORTS)
+
+
+def test_torchserve_access(torchserve):
+    """Test that the inference API returns status 200."""
+    container, tokens = torchserve
+    response = requests.get(
+        _get_inference_url(container) + "/ping",
+        headers=_authorization_header(tokens["inference"]["key"]),
+        timeout=TIMEOUT_CALL,
     )
+    assert response.status_code == 200
 
 
-def test_torchserve_access():
-    """Test of basic communication with the container returns status 200 (OK)."""
-    try:
-        url = _get_inference_url(container) + "/ping"
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        if response.status_code == 200:
-            assert True
-    except ConnectionError:
-        assert False
+def test_health(torchserve):
+    """Test that TorchServe reports itself as healthy."""
+    container, tokens = torchserve
+    response = requests.get(
+        _get_inference_url(container) + "/ping",
+        headers=_authorization_header(tokens["inference"]["key"]),
+        timeout=TIMEOUT_CALL,
+    )
+    assert response.json()["status"] == "Healthy"
 
 
-def test_health():
-    try:
-        url = _get_inference_url(container) + "/ping"
-        response = requests.get(url, timeout=TIMEOUT_CALL)
-        if response.json()["status"] == "Healthy":
-            assert True
-    except ConnectionError:
-        assert False
-
-
-def test_list_models():
+def test_list_models(torchserve):
     """Verify that the CNN model can be accessed."""
-    url = _get_management_url(container) + "/models"
-    response = requests.get(url, timeout=15)
+    container, tokens = torchserve
+    response = requests.get(
+        _get_management_url(container) + "/models",
+        headers=_authorization_header(tokens["management"]["key"]),
+        timeout=15,
+    )
     assert response.json()["models"][0]["modelName"] == "cnn"
 
 
-def test_scale_workers():
+def test_scale_workers(torchserve):
     """Verify that the number of workers can be scaled."""
+    container, tokens = torchserve
     num_workers = rnd.randint(2, 6)
-    url = _get_management_url(container) + "/models/cnn"
-    data = {"min_worker": num_workers, "synchronous": "true"}
-    response = requests.put(url, params=data)
-    assert response.json()["status"] == "Workers scaled to {} for model: cnn".format(
-        num_workers
+    response = requests.put(
+        _get_management_url(container) + "/models/cnn",
+        params={"min_worker": num_workers, "synchronous": "true"},
+        headers=_authorization_header(tokens["management"]["key"]),
+        timeout=15,
+    )
+    assert (
+        response.json()["status"] == f"Workers scaled to {num_workers} for model: cnn"
     )
 
 
-def test_prediction():
-    """Test that we can send MNIST images to the model an get the correct prediction in return.
-    Do this twice to avoid false positive"""
+def test_prediction(torchserve):
+    """Test that two MNIST images produce the correct predictions."""
+    container, tokens = torchserve
     url = _get_inference_url(container) + "/predictions/cnn"
-    file_1 = {
-        "data": open(
-            os.path.join(
-                os.getcwd(), "serve-torchserve", "tests", "test_data", "0.png"
-            ),
-            "rb",
+    headers = _authorization_header(tokens["inference"]["key"])
+
+    with open(
+        os.path.join(os.getcwd(), "serve-torchserve", "tests", "test_data", "0.png"),
+        "rb",
+    ) as image:
+        response = requests.post(
+            url, files={"data": image}, headers=headers, timeout=15
         )
-    }
-    file_2 = {
-        "data": open(
-            os.path.join(
-                os.getcwd(), "serve-torchserve", "tests", "test_data", "1.png"
-            ),
-            "rb",
+    assert response.json() == 0
+
+    with open(
+        os.path.join(os.getcwd(), "serve-torchserve", "tests", "test_data", "1.png"),
+        "rb",
+    ) as image:
+        response = requests.post(
+            url, files={"data": image}, headers=headers, timeout=15
         )
-    }
-    response = requests.post(url, files=file_1)
-    prediction = response.json()
-    assert prediction == 0
-
-    response = requests.post(url, files=file_2)
-    prediction = response.json()
-    assert prediction == 1
+    assert response.json() == 1
 
 
-def test_shutdown():
-    container.stop()
+def _authorization_header(token):
+    return {"Authorization": f"Bearer {token}"}
+
+
+def _get_url(container, port):
+    """Get the localhost URL for a container port published by Docker."""
     container.reload()
-    assert container.status == "exited"
-    container.remove()
-
-
-# Private methods
-
-
-def _get_ip(container):
-    """Gets the IP of the container."""
-    return container.attrs["NetworkSettings"]["Networks"]["bridge"]["IPAddress"]
+    host_port = container.ports[f"{port}/tcp"][0]["HostPort"]
+    return f"http://127.0.0.1:{host_port}"
 
 
 def _get_inference_url(container):
-    """Gets the correct adress for inference."""
-    url = "http://{}:8080".format(_get_ip(container))
-    return url
+    """Get the inference API URL."""
+    return _get_url(container, 8080)
 
 
 def _get_management_url(container):
-    """Gets the correct adress for torchserve management."""
-    url = "http://{}:8081".format(_get_ip(container))
-    return url
+    """Get the management API URL."""
+    return _get_url(container, 8081)
+
+
+def _wait_for_tokens(container):
+    deadline = time.monotonic() + STARTUP_TIMEOUT
+    while time.monotonic() < deadline:
+        result = container.exec_run("cat /home/model-server/key_file.json")
+        if result.exit_code == 0:
+            return json.loads(result.output)
+        time.sleep(1)
+    raise TimeoutError("TorchServe did not create its authorization tokens in time")
+
+
+def _wait_for_ready(container, token):
+    deadline = time.monotonic() + STARTUP_TIMEOUT
+    while time.monotonic() < deadline:
+        container.reload()
+        if container.status != "running":
+            raise RuntimeError(container.logs().decode())
+        try:
+            response = requests.get(
+                _get_inference_url(container) + "/ping",
+                headers=_authorization_header(token),
+                timeout=TIMEOUT_CALL,
+            )
+            if response.status_code == 200:
+                return
+        except RequestException:
+            pass
+        time.sleep(1)
+    raise TimeoutError("TorchServe did not become ready in time")
