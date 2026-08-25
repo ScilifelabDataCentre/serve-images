@@ -37,7 +37,7 @@ jobs:
             rm ./serve-jupyterlab-tensorflow/basic.ipynb
 
       - name: Display all HIGH vulnerabilities using Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
               image-ref: 'test-image'
               format: 'table'
@@ -47,7 +47,7 @@ jobs:
               exit-code: '0'
     
       - name: Fail only if CRITICAL vulnerabilities found using Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
               image-ref: 'test-image'
               format: 'table'

@@ -5,7 +5,6 @@ import time
 import requests
 import docker
 
-
 # Settings
 PORT = 8787  # the RStudio port
 TIMEOUT_CALL = 5  # the timeout in seconds of the client request call

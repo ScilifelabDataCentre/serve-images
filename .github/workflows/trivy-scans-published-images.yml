@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Trivy vulnerability scanner on serve-jupyterlab:latest
-        uses: aquasecurity/trivy-action@0.7.1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: "ghcr.io/scilifelabdatacentre/serve-jupyterlab:latest"
           format: "sarif"
@@ -51,7 +51,7 @@ jobs:
 
 
       - name: Run Trivy vulnerability scanner on serve-rstudio:latest
-        uses: aquasecurity/trivy-action@0.7.1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: "ghcr.io/scilifelabdatacentre/serve-rstudio:latest"
           format: "sarif"
@@ -70,7 +70,7 @@ jobs:
 
 
       - name: Run Trivy vulnerability scanner on serve-torchserve:latest
-        uses: aquasecurity/trivy-action@0.7.1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: "ghcr.io/scilifelabdatacentre/serve-torchserve:latest"
           format: "sarif"
@@ -89,7 +89,7 @@ jobs:
 
 
       - name: Run Trivy vulnerability scanner on serve-mlflow:latest
-        uses: aquasecurity/trivy-action@0.7.1
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           image-ref: "ghcr.io/scilifelabdatacentre/serve-mlflow:latest"
           format: "sarif"
